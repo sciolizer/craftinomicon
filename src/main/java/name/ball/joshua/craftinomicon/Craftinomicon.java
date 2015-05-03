@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -64,9 +65,14 @@ public class Craftinomicon extends JavaPlugin {
         class RecipeBookConsumeEventHandler implements Listener {
             @EventHandler
             public void onConsumeRecipeBook(PlayerInteractEvent event) {
-                ItemStack itemInHand = event.getPlayer().getItemInHand();
-                if (isRecipeBook(itemInHand)) {
-                    nei.showAllItems(event.getPlayer());
+                Action action = event.getAction();
+                switch (action) {
+                    case RIGHT_CLICK_AIR:
+                    case RIGHT_CLICK_BLOCK:
+                        ItemStack itemInHand = event.getPlayer().getItemInHand();
+                        if (isRecipeBook(itemInHand)) {
+                            nei.showAllItems(event.getPlayer());
+                        }
                 }
             }
 
