@@ -2,9 +2,15 @@ Craftinomicon
 =============
 
 Craftinomicon is a [bukkit](https://bukkit.org/) plugin. It adds a new item to the game of minecraft, the craftinomicon,
-which is a cheat sheet for all crafting recipes in the game of minecraft.
+which is a cheat sheet for all crafting recipes in the game of minecraft. It is inspired by
+[NEI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1279956-chickenbones-mods),
+but it works with vanilla clients.
 
-Craft a book and crafting table together to create the craftinomicon. Rick clicking while selecting the craftinomicon
+Craft a book and crafting table together to create the craftinomicon.
+
+![Craftinomicon recipe](docs/img/craftinomicon.img "Craftinomicon recipe")
+
+Right click while selecting the craftinomicon
 in your hot bar, and the craftinomicon interface will appear.
 
 ![Browser screen](docs/img/browser.png "Browser screen")
