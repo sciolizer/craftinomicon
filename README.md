@@ -36,7 +36,7 @@ Furnace recipes are also supported.
 
 ![Cactus green recipe](docs/img/cactus-green.png "Cactus green recipe")
 
-The craftinomicon uses the bukkit api to query for all known recipes, so in theory te craftinomicon
+The craftinomicon uses the bukkit api to query for all known recipes, so in theory the craftinomicon
 should be able to display recipes
 from other plugins. This has not been tested, however.
 
