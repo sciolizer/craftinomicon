@@ -1,23 +1,27 @@
 package name.ball.joshua.craftinomicon.recipe;
 
+import name.ball.joshua.craftinomicon.di.InitializingBean;
+import name.ball.joshua.craftinomicon.di.Inject;
 import org.bukkit.material.MaterialData;
 
-import java.util.Map;
+public class BrowserScreen implements Screen, InitializingBean {
 
-public class BrowserScreen implements Screen {
+    @Inject private BrowserScreenFactory browserScreenFactory;
+    @Inject private RecipeMenuItems recipeMenuItems;
+    @Inject private MenuUtilsFactory menuUtilsFactory;
+    @Inject private RecipeSnapshot recipeSnapshot;
 
-    protected ScreenUtilsFactory screenUtilsFactory;
-    protected BrowserScreenFactory browserScreenFactory;
-    protected RecipeSnapshot recipeSnapshot;
-    protected int page;
+    private int page;
+    private int numPages;
 
-    public BrowserScreen(ScreenUtilsFactory screenUtilsFactory, BrowserScreenFactory browserScreenFactory, RecipeSnapshot recipeSnapshot, int page) {
-        this.screenUtilsFactory = screenUtilsFactory;
-        this.browserScreenFactory = browserScreenFactory;
-        this.recipeSnapshot = recipeSnapshot;
+    public BrowserScreen(int page) {
+        this.page = page;
+    }
 
-        int size = recipeSnapshot.snapshot.size();
-        int numPages = (size - 1) / 54 + 1;
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        int size = recipeSnapshot.getAllMaterialsInAtLeastOneRecipe().size();
+        numPages = (size - 1) / ITEMS_PER_PAGE + 1;
         while (page < 0) {
             page = page + numPages;
         }
@@ -28,21 +32,23 @@ public class BrowserScreen implements Screen {
     public void populate(final Menu menu) {
         menu.clear();
 
-        int offset = page * 54;
+        int offset = page * ITEMS_PER_PAGE;
         int i = 0;
         // todo: use submap feature of sortedmap instead of iterating through each time
-        for (final Map.Entry<MaterialData, MaterialRecipes> entry : recipeSnapshot.snapshot.entrySet()) {
+        for (MaterialData materialData : recipeSnapshot.getAllMaterialsInAtLeastOneRecipe()) {
             if (i >= offset) {
                 int index = i - offset;
-                menu.setMenuItem(index, entry.getKey().toItemStack(1), screenUtilsFactory.newScreenUtils(menu).getRecipeClickHandler(entry.getKey()));
+                menu.setMenuItem(index, recipeMenuItems.getRecipeMenuItem(materialData.toItemStack(1)));
             }
             i++;
-            if (i >= offset + 45) {
+            if (i >= offset + ITEMS_PER_PAGE) {
                 break;
             }
         }
 
-        screenUtilsFactory.newScreenUtils(menu).addNavigators(browserScreenFactory.newBrowserScreen(page - 1), browserScreenFactory.newBrowserScreen(page + 1));
+        menuUtilsFactory.newMenuUtils(menu).addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1));
     }
+
+    private static final int ITEMS_PER_PAGE = 45;
 
 }

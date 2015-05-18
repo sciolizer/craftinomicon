@@ -4,29 +4,30 @@ import name.ball.joshua.craftinomicon.recipe.RecipeSnapshotTest;
 import name.ball.joshua.craftinomicon.recipe.Setup;
 import name.ball.joshua.craftinomicon.recipe.Test;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-public class CraftinomiconTestRunner implements Listener {
+public class CraftinomiconTestRunner {
 
-    private static final UUID JOSHUA_BALL_UUID = UUID.fromString("13572363-c7dd-497e-a516-9bdcf156d5a2");
-
-	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event) throws InvocationTargetException, IllegalAccessException, InstantiationException {
-        Player player = event.getPlayer();
-        if (player == null) {
-            return;
+	public void runTests() {
+        try {
+            runTestsThrowing();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        if (!JOSHUA_BALL_UUID.equals(player.getUniqueId())) {
+    }
+
+    public void runTestsThrowing() throws Exception {
+        try {
+            if (!"kenodayroll-lm".equals(InetAddress.getLocalHost().getHostName())) {
+                return;
+            }
+        } catch (UnknownHostException e) {
             return;
         }
 

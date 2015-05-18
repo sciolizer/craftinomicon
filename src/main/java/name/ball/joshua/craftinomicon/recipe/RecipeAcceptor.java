@@ -6,7 +6,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
 public class RecipeAcceptor {
-    protected static <T> T accept(Recipe recipe, RecipeVisitor<T> visitor) {
+    public static <T> T accept(Recipe recipe, RecipeVisitor<T> visitor) {
         if (recipe instanceof ShapedRecipe) {
             ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
             return visitor.visit(shapedRecipe);

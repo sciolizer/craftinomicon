@@ -1,27 +1,25 @@
 package name.ball.joshua.craftinomicon.recipe;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Menu {
 
-    protected Map<Material,SortedSet<MaterialData>> substitutables;
-    protected HumanEntity humanEntity;
-    protected Inventory inventory;
-    protected List<List<MenuItem>> menuItemsHistory;
-    protected MenuItemClickHandler playerMenuItemClickHandler;
+    private HumanEntity humanEntity;
+    private Inventory inventory;
+    private List<List<MenuItem>> menuItemsHistory;
+    private InventoryClickHandler defaultInventoryClickHandler;
 
-    public Menu(Map<Material,SortedSet<MaterialData>> substitutables, HumanEntity humanEntity, int size, String title, MenuItemClickHandler playerMenuItemClickHandler) {
-        this.substitutables = substitutables;
+    public Menu(HumanEntity humanEntity, int size, String title, InventoryClickHandler defaultInventoryClickHandler) {
         this.humanEntity = humanEntity;
-        this.playerMenuItemClickHandler = playerMenuItemClickHandler;
+        this.defaultInventoryClickHandler = defaultInventoryClickHandler;
         this.inventory = Bukkit.createInventory(humanEntity, size, title);
         List<MenuItem> mostRecent = new ArrayList<MenuItem>(size);
         for (int i = 0; i < size; i++) {
@@ -29,10 +27,6 @@ public class Menu {
         }
         this.menuItemsHistory = new ArrayList<List<MenuItem>>();
         this.menuItemsHistory.add(mostRecent);
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 
     public int historySize() {
@@ -49,48 +43,28 @@ public class Menu {
         this.menuItemsHistory.remove(this.menuItemsHistory.size() - 1);
         List<MenuItem> menuItems = getMenuItems();
         for (int i = 0; i < menuItems.size(); i++) {
-            MenuItem menuItem = menuItems.get(i);
-            setItem(i, menuItem == null ? null : menuItem.rotatable);
+            setMenuItem(i, menuItems.get(i));
         }
         return true;
     }
 
-    protected List<MenuItem> getMenuItems() {
+    private List<MenuItem> getMenuItems() {
         return this.menuItemsHistory.get(this.menuItemsHistory.size() - 1);
     }
 
     public void clear() {
         List<MenuItem> menuItems = getMenuItems();
         for (int i = 0; i < menuItems.size(); i++) {
-            setItem(i, null);
-            menuItems.set(i, null);
+            setMenuItem(i, null);
         }
     }
 
-    public void setMenuItem(int i, ItemStack itemStack, MenuItemClickHandler menuItemClickHandler) {
-        setItem(i, itemStack);
-        getMenuItems().set(i, new MenuItem(menuItemClickHandler, itemStack));
+    public void setMenuItem(int i, MenuItem menuItem) {
+        inventory.setItem(i, randomItemStack(menuItem));
+        getMenuItems().set(i, menuItem);
     }
 
-    protected void setItem(int i, ItemStack stack) {
-        inventory.setItem(i, randomSubstitute(stack));
-    }
-
-    protected static Random random = new Random();
-
-    protected ItemStack randomSubstitute(ItemStack data) {
-        if (data == null) return null;
-        MaterialData data1 = data.getData();
-        byte data2 = data1.getData();
-        if (data2 != (byte)-1) return data;
-        SortedSet<MaterialData> subst = substitutables.get(data.getType());
-        if (subst == null) {
-            return data;
-        }
-        int ind = random.nextInt(subst.size());
-        MaterialData materialData = new ArrayList<MaterialData>(subst).get(ind);
-        return materialData.toItemStack(data.getAmount());
-    }
+    private static Random random = new Random();
 
     // todo: separate recipe book recipe from ordinary book recipe
     // todo: disallow the use of a recipe book as a crafting ingredient
@@ -100,50 +74,43 @@ public class Menu {
     }
 
     // NOT an @EventHandler; the real event handler is in MenuFactory
-    public void onInventoryClick(InventoryClickEvent inventoryClickEvent) {
+    public void onInventoryClick(final InventoryClickEvent inventoryClickEvent) {
         if (this.inventory.equals(inventoryClickEvent.getInventory())) {
             inventoryClickEvent.setCancelled(true);
             int slot = inventoryClickEvent.getRawSlot();
             List<MenuItem> menuItems = getMenuItems();
+            InventoryClickHandler.MenuItemClickEvent menuItemClickEvent = new InventoryClickHandler.MenuItemClickEvent() {
+                @Override
+                public Menu getMenu() {
+                    return Menu.this;
+                }
+
+                @Override
+                public InventoryClickEvent getInventoryClickEvent() {
+                    return inventoryClickEvent;
+                }
+            };
             if (slot >= 0 && slot < menuItems.size()) {
                 MenuItem menuItem = menuItems.get(slot);
                 if (menuItem != null) {
-                    MenuItemClickHandler menuItemClickHandler = menuItem.clickHandler;
-                    menuItemClickHandler.onInventoryClick(inventoryClickEvent, inventory.getItem(slot));
+                    menuItem.onInventoryClick(menuItemClickEvent);
                 }
             } else {
-                playerMenuItemClickHandler.onInventoryClick(inventoryClickEvent, inventoryClickEvent.getCurrentItem());
+                defaultInventoryClickHandler.onInventoryClick(menuItemClickEvent);
             }
         }
+    }
+
+    private ItemStack randomItemStack(MenuItem menuItem) {
+        if (menuItem == null) return null;
+        List<ItemStack> itemStackRotation = menuItem.getItemStackRotation();
+        return itemStackRotation.get(random.nextInt(itemStackRotation.size()));
     }
 
     public void rotateSubstitutables() {
         List<MenuItem> menuItems = getMenuItems();
         for (int i = 0; i < menuItems.size(); i++) {
-            MenuItem menuItem = menuItems.get(i);
-            if (menuItem != null && menuItem.rotatable != null) {
-                setItem(i, menuItem.rotatable);
-            }
-        }
-    }
-
-    public static interface MenuItemClickHandler {
-        void onInventoryClick(InventoryClickEvent inventoryClickEvent, ItemStack currentItemStack);
-        public static final MenuItemClickHandler NULL = new MenuItemClickHandler() {
-            @Override
-            public void onInventoryClick(InventoryClickEvent inventoryClickEvent, ItemStack currentItemStack) {
-
-            }
-        };
-    }
-
-    protected static class MenuItem {
-        public MenuItemClickHandler clickHandler;
-        public ItemStack rotatable;
-
-        public MenuItem(MenuItemClickHandler clickHandler, ItemStack rotatable) {
-            this.clickHandler = clickHandler;
-                this.rotatable = rotatable;
+            setMenuItem(i, menuItems.get(i));
         }
     }
 

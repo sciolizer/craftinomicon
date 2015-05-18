@@ -1,8 +1,8 @@
 package name.ball.joshua.craftinomicon;
 
-import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
-import name.ball.joshua.craftinomicon.recipe.MenuFactory;
-import name.ball.joshua.craftinomicon.recipe.NEI;
+import name.ball.joshua.craftinomicon.di.DI;
+import name.ball.joshua.craftinomicon.di.Inject;
+import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,22 +16,28 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Craftinomicon extends JavaPlugin {
 
-    protected NEI nei;
+    @Inject
+    private RecipeBrowser recipeBrowser;
 
     public void onDisable() {
     }
 
     public void onEnable() {
-        PluginManager pm = this.getServer().getPluginManager();
+//        new CraftinomiconTestRunner().runTests();
 
-        pm.registerEvents(new CraftinomiconTestRunner(), this);
+        getDI().injectMembers(this);
+
+        PluginManager pm = this.getServer().getPluginManager();
 
         final ItemStack recipeBookItem = new ItemStack(Material.BOOK);
         ItemMeta itemMeta = recipeBookItem.getItemMeta();
@@ -44,6 +50,7 @@ public class Craftinomicon extends JavaPlugin {
 
         final Server server = Bukkit.getServer();
         server.addRecipe(recipeBookRecipe);
+
         class RecipeBookCraftingInterceptor implements Listener {
             @EventHandler
             public void convertToRecipeBook(PrepareItemCraftEvent event) {
@@ -71,23 +78,21 @@ public class Craftinomicon extends JavaPlugin {
                     case RIGHT_CLICK_BLOCK:
                         ItemStack itemInHand = event.getPlayer().getItemInHand();
                         if (isRecipeBook(itemInHand)) {
-                            nei.showAllItems(event.getPlayer());
+                            recipeBrowser.showAllItems(event.getPlayer());
                         }
                 }
             }
-
         }
         pm.registerEvents(new RecipeBookConsumeEventHandler(), this);
-
-        MenuFactory menuFactory = new MenuFactory(this);
-        pm.registerEvents(menuFactory, this);
-        this.nei = new NEI(menuFactory);
 
         // We don't actually want to compute the recipe list until a player action requires it, since other plugins
         // might not yet have had a chance to register their recipes. But doing a dry-run here will let us detect
         // bugs early. If the initialization fails, then bukkit will disable this plugin, and so players will
         // not be left with buggy craftinomicon books.
-        new RecipeSnapshot(new MaterialDataSubstitutes()).initialize();
+        getDI().injectMembers(new Object() {
+            @Inject
+            private RecipeSnapshot recipeSnapshot;
+        });
     }
 
     protected boolean isRecipeBook(ItemStack itemStack) {
@@ -98,6 +103,15 @@ public class Craftinomicon extends JavaPlugin {
 
     public static final String RECIPE_BOOK_DISPLAY_NAME = "Craftinomicon";
 
-    // todo: make coal clickable?
+    private DI getDI() {
+        Map<Class<?>, DI.Provider<?>> providers = new LinkedHashMap<Class<?>, DI.Provider<?>>();
+        providers.put(Plugin.class, new DI.Provider<Plugin>() {
+            @Override
+            public Plugin get() {
+                return Craftinomicon.this;
+            }
+        });
+        return new DI(providers);
+    }
 
 }
