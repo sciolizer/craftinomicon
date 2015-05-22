@@ -2,13 +2,13 @@ Craftinomicon
 =============
 
 Craftinomicon is a [bukkit](https://bukkit.org/) plugin. It adds a new item to the game of minecraft, the craftinomicon,
-which is a cheat sheet for all crafting recipes in the game of minecraft. It is inspired by
+which is a cheat sheet for all crafting recipes in the game of minecraft. It is directly inspired by
 [NEI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1279956-chickenbones-mods),
-but it works with vanilla clients.
+but as a bukkit plugin, it works with vanilla clients.
 
 Craft a book and crafting table together to create the craftinomicon.
 
-![Craftinomicon recipe](docs/img/craftinomicon.img "Craftinomicon recipe")
+![Craftinomicon recipe](docs/img/craftinomicon.png "Craftinomicon recipe")
 
 Right click while selecting the craftinomicon
 in your hot bar, and the craftinomicon interface will appear.
@@ -28,9 +28,7 @@ Right click any item to see which recipes it is used in. For instance, bone meal
 
 ![Bone meal usage](docs/img/bonemeal.png "Bone meal usage")
 
-The numbers at the bottom indicate that bone meal is used in 2 shaped recipes, 8 shapeless recipes, and that we are
-currently looking at the 5th shapeless recipe. Click the left crafting table to jump to the first shaped recipe,
-or the right crafting table to jump to the first shapeless recipe.
+At the bottom are the different items that can be crafted from bone meal.
 
 Furnace recipes are also supported.
 
@@ -40,12 +38,12 @@ The craftinomicon uses the bukkit api to query for all known recipes, so in theo
 should be able to display recipes
 from other plugins. This has not been tested, however.
 
-Craftinomicon was developed against the bukkit api for minecraft 1.7.10.
+Craftinomicon was developed against the bukkit api for minecraft 1.8.3.
 
 Building and installing
 -----------------------
 
 ```
 mvn clean package
-cp target/*.jar ~/CraftBukkit/plugins
+cp target/*.jar ~/server/plugins
 ```

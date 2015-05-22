@@ -3,6 +3,7 @@ package name.ball.joshua.craftinomicon.recipe;
 import name.ball.joshua.craftinomicon.di.Inject;
 import org.bukkit.Material;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
@@ -35,15 +36,15 @@ public class RecipeScreen implements Screen {
 
         menu.setMenuItem(15, recipeMenuItems.getRecipeMenuItem(recipe.getResult()));
 
-        final ItemStack[] typeItem = new ItemStack[1];
-
         RecipeAcceptor.accept(recipe, new RecipeVisitor<Void>() {
             @Override
             public Void visit(ShapedRecipe shapedRecipe) {
-                typeItem[0] = new ItemStack(Material.WORKBENCH, 1);
+                showType(menu, Material.WORKBENCH, "The above recipe is for placing in a crafting grid.");
+
                 int row = 0;
                 String[] sh = shapedRecipe.getShape();
-                if (sh.length == 1) row = 1;
+                if (sh.length == 1)
+                    row = 1;
                 for (String shape : sh) {
                     int col = 0;
                     char[] chars = shape.toCharArray();
@@ -64,7 +65,8 @@ public class RecipeScreen implements Screen {
 
             @Override
             public Void visit(ShapelessRecipe shapelessRecipe) {
-                typeItem[0] = new ItemStack(Material.WORKBENCH, 1);
+                showType(menu, Material.WORKBENCH, "The above recipe is for placing in a crafting grid.");
+
                 int i = 0;
                 for (ItemStack ingredient : shapelessRecipe.getIngredientList()) {
                     setMenuItem(menu, SHAPELESS_RECIPE_SLOTS[i], ingredient);
@@ -75,7 +77,7 @@ public class RecipeScreen implements Screen {
 
             @Override
             public Void visit(FurnaceRecipe furnaceRecipe) {
-                typeItem[0] = new ItemStack(Material.FURNACE, 1);
+                showType(menu, Material.FURNACE, "The above recipe is for placing in a furnace.");
 
                 setMenuItem(menu, 12, furnaceRecipe.getInput());
                 return null;
@@ -87,7 +89,6 @@ public class RecipeScreen implements Screen {
             }
         });
 
-        menu.setMenuItem(30, new UnclickableMenuItem(typeItem[0]));
 
         final MenuUtils menuUtils = menuUtilsFactory.newMenuUtils(menu);
         if (recipes.size() > 1) {
@@ -103,6 +104,14 @@ public class RecipeScreen implements Screen {
         }
 
         showIndices(menu);
+    }
+
+    private void showType(Menu menu, Material icon, String displayName) {
+        ItemStack itemStack = new ItemStack(icon, 1);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setDisplayName(displayName);
+        itemStack.setItemMeta(itemMeta);
+        menu.setMenuItem(30, new UnclickableMenuItem(itemStack));
     }
 
     private void setMenuItem(Menu menu, int slot, ItemStack stack) {
@@ -124,8 +133,7 @@ public class RecipeScreen implements Screen {
             firstRecipe = 0;
         } else {
             firstColumn = 1;
-            int currentPage = offset / 7;
-            firstRecipe = currentPage * 7;
+            firstRecipe = Math.min(size - 7, Math.max(0, offset - 3));
         }
         for (int i = firstRecipe; i < recipes.size() && i < firstRecipe + 7; i++) {
             final int j = i;

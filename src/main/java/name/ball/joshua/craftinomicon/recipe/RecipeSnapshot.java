@@ -42,6 +42,9 @@ public class RecipeSnapshot {
                     continue recipes; // skip chain armor recipes
                 }
             }
+            if (recipe.getResult().getAmount() == 0) {
+                continue; // purple dye crafts into 0 black banners?!
+            }
             MaterialData data = recipe.getResult().getData();
             getMaterialRecipes(data).addRecipe(recipe);
             for (ItemStack ingredient : ingredients) {

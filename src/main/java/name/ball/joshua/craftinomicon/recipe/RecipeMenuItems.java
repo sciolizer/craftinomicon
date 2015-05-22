@@ -75,6 +75,7 @@ public class RecipeMenuItems {
             lore.add(numUsages + " " + pluralize("usage", numUsages) + " (Right-click)");
         }
         ItemMeta itemMeta = itemStack.getItemMeta();
+        // todo: sometimes itemMeta can be null?!
         itemMeta.setLore(lore);
         ItemStack lorifiedItemStack = itemStack.clone();
         lorifiedItemStack.setItemMeta(itemMeta);
