@@ -1,8 +1,6 @@
 package name.ball.joshua.craftinomicon.recipe;
 
-import name.ball.joshua.craftinomicon.di.InitializingBean;
 import name.ball.joshua.craftinomicon.di.Inject;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,18 +13,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.WeakHashMap;
 
-public class MenuRegistry implements Listener, InitializingBean {
+public class MenuRegistry implements Listener {
 
     @Inject private Plugin plugin;
     @Inject private MenuFactory menuFactory;
 
     private final WeakHashMap<HumanEntity,Menu> menus = new WeakHashMap<HumanEntity, Menu>();
     private boolean timerRunning = false;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
-    }
 
     public Menu newMenu(HumanEntity humanEntity, int size, String title, InventoryClickHandler defautInventoryClickHandler) {
         Menu menu = menuFactory.newMenu(humanEntity, size, title, defautInventoryClickHandler);

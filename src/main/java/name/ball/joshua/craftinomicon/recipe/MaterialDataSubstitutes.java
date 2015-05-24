@@ -17,8 +17,7 @@ public class MaterialDataSubstitutes {
 
     private Map<Material, SortedSet<MaterialData>> substitutes;
 
-    private void initialize() {
-        if (substitutes != null) return;
+    public void initialize() {
         substitutes = new LinkedHashMap<Material, SortedSet<MaterialData>>();
         Iterator<Recipe> recipeIterator = Bukkit.getServer().recipeIterator();
         while (recipeIterator.hasNext()) {
@@ -32,7 +31,6 @@ public class MaterialDataSubstitutes {
     }
 
     public List<MaterialData> get(MaterialData data) {
-        initialize();
         Material material = data.getItemType();
         if (data.getData() != (byte) -1 || !substitutes.containsKey(material)) {
             return Collections.singletonList(data);

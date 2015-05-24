@@ -2,6 +2,7 @@ package name.ball.joshua.craftinomicon;
 
 import name.ball.joshua.craftinomicon.di.DI;
 import name.ball.joshua.craftinomicon.di.Inject;
+import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
 import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
 import org.bukkit.Bukkit;
@@ -19,15 +20,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Craftinomicon extends JavaPlugin {
 
-    @Inject
-    private RecipeBrowser recipeBrowser;
+    @Inject private MaterialDataSubstitutes materialDataSubstitutes;
+    @Inject private RecipeBrowser recipeBrowser;
+    @Inject private RecipeSnapshot recipeSnapshot;
 
     public void onDisable() {
     }
@@ -35,9 +36,10 @@ public class Craftinomicon extends JavaPlugin {
     public void onEnable() {
 //        new CraftinomiconTestRunner().runTests();
 
-        getDI().injectMembers(this);
+        final DI di = getDI();
+        di.injectMembers(this);
 
-        PluginManager pm = this.getServer().getPluginManager();
+        final PluginManager pm = this.getServer().getPluginManager();
 
         final ItemStack recipeBookItem = new ItemStack(Material.BOOK);
         ItemMeta itemMeta = recipeBookItem.getItemMeta();
@@ -85,14 +87,19 @@ public class Craftinomicon extends JavaPlugin {
         }
         pm.registerEvents(new RecipeBookConsumeEventHandler(), this);
 
-        // We don't actually want to compute the recipe list until a player action requires it, since other plugins
-        // might not yet have had a chance to register their recipes. But doing a dry-run here will let us detect
-        // bugs early. If the initialization fails, then bukkit will disable this plugin, and so players will
-        // not be left with buggy craftinomicon books.
-        getDI().injectMembers(new Object() {
-            @Inject
-            private RecipeSnapshot recipeSnapshot;
-        });
+        // We don't want to construct the recipe index until after the other plugins have loaded and had a chance
+        // to register their recipes.
+        new BukkitRunnable() {
+            @Override public void run() {
+                materialDataSubstitutes.initialize();
+                recipeSnapshot.initialize();
+                for (Object o : di.getAllKnownInstances()) {
+                    if (o instanceof Listener) {
+                        pm.registerEvents((Listener)o, Craftinomicon.this);
+                    }
+                }
+            }
+        }.runTask(this);
     }
 
     protected boolean isRecipeBook(ItemStack itemStack) {

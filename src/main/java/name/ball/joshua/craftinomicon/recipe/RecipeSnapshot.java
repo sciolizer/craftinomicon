@@ -26,8 +26,7 @@ public class RecipeSnapshot {
     // in the output.
     private static final List<Material> NO_SHAPELESS_RECIPES = Arrays.asList(Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE, Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS, Material.FIREWORK);
 
-    private void initialize() {
-        if (snapshot != null) return;
+    public void initialize() {
         snapshot = new TreeMap<MaterialData, MaterialRecipes>(materialDataComparator);
         Iterator<Recipe> recipeIterator = Bukkit.getServer().recipeIterator();
         recipes:
@@ -59,7 +58,6 @@ public class RecipeSnapshot {
     // todo: other ways of getting items
 
     public MaterialRecipes getMaterialRecipes(MaterialData dataX) {
-        initialize();
         MaterialData data = normalize(dataX);
         if (!snapshot.containsKey(data)) {
             snapshot.put(data, materialRecipesFactory.newMaterialRecipes());
@@ -68,7 +66,6 @@ public class RecipeSnapshot {
     }
 
     public Set<MaterialData> getAllMaterialsInAtLeastOneRecipe() {
-        initialize();
         Set<MaterialData> result = new LinkedHashSet<MaterialData>();
         for (MaterialData materialData : snapshot.keySet()) {
             result.add(normalize(materialData));

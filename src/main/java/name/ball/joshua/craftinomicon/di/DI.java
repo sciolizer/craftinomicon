@@ -23,6 +23,11 @@ public class DI {
         }
     }
 
+    // must be called after `injectMembers`
+    public Collection<Object> getAllKnownInstances() {
+        return Collections.unmodifiableCollection(instances.values());
+    }
+
     private void injectMembers(List<Class<?>> constructing, Object o) throws Exception {
         for (Map.Entry<Field, Object> entry : buildFieldMap(constructing, o.getClass()).entrySet()) {
             entry.getKey().set(o, entry.getValue());
@@ -189,4 +194,5 @@ public class DI {
             return instance;
         }
     }
+
 }
