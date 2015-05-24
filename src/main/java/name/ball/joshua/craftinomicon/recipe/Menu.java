@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// todo: consider replacing with http://bukkit.org/threads/enviousapi-titles-config-itemstackbuilder-inventorygui-commandpages-cooldowns.349855/
 public class Menu {
 
     private HumanEntity humanEntity;
