@@ -6,6 +6,11 @@ which is a cheat sheet for all crafting recipes in the game of minecraft. It is 
 [NEI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1279956-chickenbones-mods),
 but as a bukkit plugin, it works with vanilla clients.
 
+[Download craftinomicon](https://github.com/sciolizer/craftinomicon/releases/download/v000.001.000/craftinomicon-0.1.jar)
+
+Usage
+-----
+
 Craft a book and crafting table together to create the craftinomicon.
 
 ![Craftinomicon recipe](docs/img/craftinomicon.png "Craftinomicon recipe")
