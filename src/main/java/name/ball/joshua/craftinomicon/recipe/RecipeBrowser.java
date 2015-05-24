@@ -2,6 +2,7 @@ package name.ball.joshua.craftinomicon.recipe;
 
 import name.ball.joshua.craftinomicon.Craftinomicon;
 import name.ball.joshua.craftinomicon.di.Inject;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +24,7 @@ public class RecipeBrowser {
             public void onInventoryClick(MenuItemClickEvent menuItemClickEvent) {
                 InventoryClickEvent inventoryClickEvent = menuItemClickEvent.getInventoryClickEvent();
                 ItemStack currentItem = inventoryClickEvent.getCurrentItem();
-                if (currentItem != null) {
+                if (currentItem != null && !currentItem.getType().equals(Material.AIR)) {
                     recipeMenuItems.getRecipeMenuItem(currentItem).onInventoryClick(menuItemClickEvent);
                 }
             }
