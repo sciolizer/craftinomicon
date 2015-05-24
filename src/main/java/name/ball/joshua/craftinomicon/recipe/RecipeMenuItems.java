@@ -21,7 +21,7 @@ public class RecipeMenuItems {
     }
 
     public MenuItem getRecipeMenuItem(List<ItemStack> unlorifiedDataStacks) {
-        final List<ItemStack> itemStacks = new ArrayList<ItemStack>(unlorifiedDataStacks.size());
+        final List<ItemStack> itemStacks = new ArrayList<ItemStack>(unlorifiedDataStacks.size()); // todo: we need to make a copy of EACH ITEM in this list, because the item stacks might be coming from a place where they already have some lore of some kind
         for (ItemStack unlorifiedDataStack : unlorifiedDataStacks) {
             itemStacks.add(attachLore(unlorifiedDataStack));
         }
