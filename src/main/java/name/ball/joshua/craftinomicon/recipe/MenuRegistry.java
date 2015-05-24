@@ -35,7 +35,7 @@ public class MenuRegistry implements Listener, InitializingBean {
         return menu;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         InventoryHolder holder = inventory.getHolder();
