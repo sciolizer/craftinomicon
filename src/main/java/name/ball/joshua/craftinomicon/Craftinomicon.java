@@ -3,6 +3,7 @@ package name.ball.joshua.craftinomicon;
 import name.ball.joshua.craftinomicon.di.DI;
 import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
+import name.ball.joshua.craftinomicon.recipe.PermissionKey;
 import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
 import name.ball.joshua.craftinomicon.recipe.i18n.MessageProvider;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -192,6 +194,15 @@ public class Craftinomicon extends JavaPlugin {
                     if (field.isAnnotationPresent(Translation.class)) {
                         Translation annotation = field.getAnnotation(Translation.class);
                         diField.setValue(messageProvider.getMessage(field.getType(), annotation.value(), annotation.english()));
+                    } else if (field.isAnnotationPresent(PermissionKey.class)) {
+                        String permissionName = field.getAnnotation(PermissionKey.class).value();
+                        for (Permission permission : getDescription().getPermissions()) {
+                            if (permission.getName().equals(permissionName)) {
+                                diField.setValue(permission);
+                                return;
+                            }
+                        }
+                        throw new IllegalArgumentException("unrecognized permission: " + permissionName);
                     } else if (field.isAnnotationPresent(Gauge.class)) {
                         class GaugePlotter extends Metrics.Plotter implements GaugeStat {
 
