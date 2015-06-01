@@ -5,9 +5,12 @@ import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
 import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
+import name.ball.joshua.craftinomicon.recipe.metrics.Gauge;
+import name.ball.joshua.craftinomicon.recipe.metrics.GaugeStat;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -21,7 +24,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.mcstats.Metrics;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,8 +46,29 @@ public class Craftinomicon extends JavaPlugin {
 //        new CraftinomiconTestRunner().runTests();
 
         DIGetter diGetter = new DIGetter();
-        final DI di = diGetter.getDI();
+        final DI di = diGetter.getDI(getConfig());
         di.injectMembers(this);
+
+        try {
+            Metrics metrics = new Metrics(this);
+            for (Map.Entry<String, List<Metrics.Plotter>> entry : diGetter.plotters.entrySet()) {
+                Metrics.Graph graph = metrics.createGraph(entry.getKey());
+                for (Metrics.Plotter plotter : entry.getValue()) {
+                    graph.addPlotter(plotter);
+                }
+                metrics.addGraph(graph);
+            }
+            Metrics.Graph version = metrics.createGraph("Version");
+            version.addPlotter(new Metrics.Plotter(getDescription().getVersion()) {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+            metrics.start();
+        } catch (IOException e) {
+            // well, not much we can do
+        }
 
         final PluginManager pm = this.getServer().getPluginManager();
 
@@ -115,7 +143,9 @@ public class Craftinomicon extends JavaPlugin {
 
     private class DIGetter {
 
-        DI getDI() {
+        Map<String,List<Metrics.Plotter>> plotters = new LinkedHashMap<String, List<Metrics.Plotter>>();
+
+        DI getDI(Configuration configuration) {
             Map<Class<?>, DI.Provider<?>> providers = new LinkedHashMap<Class<?>, DI.Provider<?>>();
             providers.put(Plugin.class, new DI.Provider<Plugin>() {
                 @Override
@@ -126,6 +156,35 @@ public class Craftinomicon extends JavaPlugin {
             DI.DIVisitor visitor = new DI.DIVisitor() {
                 @Override
                 public void visitField(DI.DIField diField) {
+                    Field field = diField.getField();
+                    if (field.isAnnotationPresent(Gauge.class)) {
+                        class GaugePlotter extends Metrics.Plotter implements GaugeStat {
+
+                            public GaugePlotter(String name) {
+                                super(name);
+                            }
+
+                            private int value = 0;
+
+                            @Override
+                            public void set(int stat) {
+                                value = stat;
+                            }
+
+                            @Override
+                            public int getValue() {
+                                return value;
+                            }
+                        }
+                        Gauge annotation = field.getAnnotation(Gauge.class);
+                        String graph = annotation.graph();
+                        if (!plotters.containsKey(graph)) {
+                            plotters.put(graph, new ArrayList<Metrics.Plotter>());
+                        }
+                        GaugePlotter gaugePlotter = new GaugePlotter(annotation.plotter());
+                        diField.setValue(gaugePlotter);
+                        plotters.get(graph).add(gaugePlotter);
+                    }
                 }
             };
             return new DI(visitor, providers);
