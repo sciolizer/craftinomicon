@@ -1,7 +1,5 @@
 package name.ball.joshua.craftinomicon.recipe;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import name.ball.joshua.craftinomicon.di.InitializingBean;
 import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.metrics.Gauge;
@@ -14,8 +12,14 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -26,7 +30,6 @@ import java.util.regex.Pattern;
 
 public class UpdateChecker implements Listener, InitializingBean {
 
-    @Inject Gson gson;
     @Inject Plugin plugin;
     @PermissionKey("craftinomicon.upgrade.announce") Permission upgradePermission;
     @Gauge(graph = "Errors", plotter = "Malformed URL Exception in UpdateChecker") GaugeStat malformedURLException;
@@ -148,8 +151,14 @@ public class UpdateChecker implements Listener, InitializingBean {
                 }
             }
 
-            List<APIFile> apiFiles = (List<APIFile>) gson.fromJson(str.toString(), new TypeToken<List<APIFile>>() {
-            }.getType());
+            JSONArray jsonArray = (JSONArray) JSONValue.parse(str.toString());
+            List<APIFile> apiFiles = new ArrayList<APIFile>();
+            for (Object o : jsonArray) {
+                JSONObject jsonObject = (JSONObject) o;
+                APIFile apiFile = new APIFile();
+                apiFile.name = (String) jsonObject.get("name");
+                apiFiles.add(apiFile);
+            }
 
             // todo: log something in the finalizer of menu to make sure that they are getting garbage collected
             Set<PlannedFeature> newFeatures = new LinkedHashSet<PlannedFeature>();
@@ -224,8 +233,6 @@ public class UpdateChecker implements Listener, InitializingBean {
 
     @SuppressWarnings("UnusedDeclaration") // values set by gson
     private static class APIFile {
-        private String downloadUrl;
-        private String gameVersion; // not sure if I want to do anything with this
         private String name;
     }
 
