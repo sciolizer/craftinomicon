@@ -8,6 +8,8 @@ but as a bukkit plugin, it works with vanilla clients.
 
 [Download craftinomicon](https://github.com/sciolizer/craftinomicon/releases/download/v000.001.000/craftinomicon-0.1.jar)
 
+[Bukkit page](http://dev.bukkit.org/bukkit-plugins/craftinomicon/)
+
 Usage
 -----
 
@@ -44,6 +46,54 @@ should be able to display recipes
 from other plugins. This has not been tested, however.
 
 Craftinomicon was developed against the bukkit api for minecraft 1.8.3.
+
+Supported languages
+-------------------
+
+Language can be changed from English by changing the language.code property in `$BUKKIT/plugins/craftinomicon/config.yml`.
+Currently supported languages are English, Simplified Chinese, and Traditional Chinese.
+Add your own translation to the [localization page](http://dev.bukkit.org/bukkit-plugins/craftinomicon/localization/)!
+
+Permissions
+-----------
+
+* `craftinomicon.craft.book` Grants the ability to craft the craftinomicon. Default value: true
+* `craftinomicon.upgrade.announce` When a new version of craftinomicon is released, users with this permission enabled will see an extra item in their craftinomicon, letting them know that an upgrade is available. If no user has this permission, then the plugin will not attempt to check for updates. Default value: op
+
+Updates
+-------
+
+By default, craftinomicon will check for updates every 24 hours. Nothing is downloaded, but ops will
+be able to see an extra item in their craftinomicon, letting them know that a new version is available.
+
+![Update sign](docs/img/update.png "Update sign")
+
+Checking for updates can be disabled by setting the `craftinomicon.upgrade.announce` permission to `false` for all users.
+
+Statistics
+----------
+
+By default, craftinomicon sends the following anonymous statistics to [mcstats.org](http://mcstats.org/plugin/craftinomicon):
+
+* Exceptions (programming errors) thrown during execution.
+* Whether the update checker is enabled or not.
+* Version of the craftinomicon plugin.
+* Which language the plugin is configured with.
+
+Collecting this information is helpful to me (sciolizer) for knowing which features to focus on.
+
+Additionally, mcstats collects the following anonymous statistics:
+
+* Number of players
+* The server's GeoIP
+* Version of minecraft
+* Version of bukkit/spigot
+
+Statistics visible to me are visible to everyone. You can read more about
+[mcstats on their website](http://mcstats.org/learn-more/).
+
+If you do not want craftinomicon to collect stats from your server, change the `opt-out` value in
+`$BUKKIT/plugins/PluginMetrics/config.yml` to true.
 
 Building and installing
 -----------------------
