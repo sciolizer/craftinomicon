@@ -8,3 +8,6 @@ permissions:
   craftinomicon.craft.book:
     description: Grants the ability to craft the craftinomicon.
     default: true
+  craftinomicon.upgrade.announce:
+    description: When a new version of craftinomicon is released, users with this permission enabled will see an extra item in their craftinomicon, letting them know that an upgrade is available. If no user has this permission, then the plugin will not attempt to check for updates.
+    default: op

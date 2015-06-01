@@ -31,7 +31,7 @@ public class RecipeBrowser {
                 }
             }
         });
-        BrowserScreen browserScreen = browserScreenFactory.newBrowserScreen(0);
+        BrowserScreen browserScreen = browserScreenFactory.newBrowserScreen(0, player);
         Menu menu = menus[0];
         browserScreen.populate(menu);
         menu.open();

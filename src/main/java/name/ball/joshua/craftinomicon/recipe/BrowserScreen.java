@@ -16,12 +16,15 @@ public class BrowserScreen implements Screen, InitializingBean {
     @Inject private RecipeMenuItems recipeMenuItems;
     @Inject private MenuUtilsFactory menuUtilsFactory;
     @Inject private RecipeSnapshot recipeSnapshot;
+    @Inject private UpdateChecker updateChecker;
 
     private int page;
     private int numPages;
+    private CommandSender player;
 
-    public BrowserScreen(int page) {
+    public BrowserScreen(int page, CommandSender player) {
         this.page = page;
+        this.player = player;
     }
 
     @Override
@@ -52,7 +55,27 @@ public class BrowserScreen implements Screen, InitializingBean {
             }
         }
 
-        menuUtilsFactory.newMenuUtils(menu).addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1));
+        MenuUtils menuUtils = menuUtilsFactory.newMenuUtils(menu);
+        menuUtils.addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1, player), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1, player));
+
+        List<String> updateText = updateChecker.getUpdateText(player);
+        if (updateText != null) {
+            ItemStack sign = menuUtils.sign("New version of craftinomicon available! Click to see link.");
+            if (updateText.size() > 0) {
+                ItemMeta itemMeta = sign.getItemMeta();
+                List<String> lore = itemMeta.getLore();
+                if (lore == null) lore = new ArrayList<String>();
+                lore.addAll(updateText);
+                itemMeta.setLore(lore);
+                sign.setItemMeta(itemMeta);
+            }
+            menu.setMenuItem(49, new RotationlessMenuItem(sign) {
+                @Override
+                public void onInventoryClick(MenuItemClickEvent menuItemClickEvent) {
+                    player.sendMessage("http://dev.bukkit.org/bukkit-plugins/craftinomicon/");
+                }
+            });
+        }
     }
 
     private static final int ITEMS_PER_PAGE = 45;
