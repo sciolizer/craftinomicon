@@ -2,7 +2,13 @@ package name.ball.joshua.craftinomicon.recipe;
 
 import name.ball.joshua.craftinomicon.di.InitializingBean;
 import name.ball.joshua.craftinomicon.di.Inject;
+import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BrowserScreen implements Screen, InitializingBean {
 

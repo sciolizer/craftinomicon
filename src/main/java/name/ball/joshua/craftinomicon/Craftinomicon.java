@@ -5,12 +5,15 @@ import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
 import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
+import name.ball.joshua.craftinomicon.recipe.i18n.MessageProvider;
+import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import name.ball.joshua.craftinomicon.recipe.metrics.Gauge;
 import name.ball.joshua.craftinomicon.recipe.metrics.GaugeStat;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -28,10 +31,7 @@ import org.mcstats.Metrics;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Craftinomicon extends JavaPlugin {
 
@@ -45,8 +45,13 @@ public class Craftinomicon extends JavaPlugin {
     public void onEnable() {
 //        new CraftinomiconTestRunner().runTests();
 
+        saveDefaultConfig();
+        FileConfiguration config = getConfig();
+        config.options().copyHeader(true);
+        saveConfig();
+
         DIGetter diGetter = new DIGetter();
-        final DI di = diGetter.getDI(getConfig());
+        final DI di = diGetter.getDI(config);
         di.injectMembers(this);
 
         try {
@@ -65,6 +70,15 @@ public class Craftinomicon extends JavaPlugin {
                     return 1;
                 }
             });
+            metrics.addGraph(version);
+            Metrics.Graph languageCodeGraph = metrics.createGraph("Language Code");
+            languageCodeGraph.addPlotter(new Metrics.Plotter(getConfig().getString("language.code")) {
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+            metrics.addGraph(languageCodeGraph);
             metrics.start();
         } catch (IOException e) {
             // well, not much we can do
@@ -153,11 +167,32 @@ public class Craftinomicon extends JavaPlugin {
                     return Craftinomicon.this;
                 }
             });
+
+            Locale locale = Locale.getDefault();
+            String languageCode = configuration.getString("language.code");
+            if (languageCode != null && !"server".equals(languageCode)) {
+                try {
+                    if (!languageCode.contains("_")) {
+                        locale = new Locale(languageCode);
+                    } else {
+                        int i = languageCode.indexOf('_');
+                        locale = new Locale(languageCode.substring(0, i), languageCode.substring(i+1));
+                    }
+                } catch (IllegalArgumentException e) {
+                    // this never fires?
+                    getLogger().warning("Unrecognized locale '" + languageCode + "'. Falling back to server default '" + locale.getLanguage() + "'");
+                }
+            }
+
+            final MessageProvider messageProvider = new MessageProvider(locale);
             DI.DIVisitor visitor = new DI.DIVisitor() {
                 @Override
                 public void visitField(DI.DIField diField) {
                     Field field = diField.getField();
-                    if (field.isAnnotationPresent(Gauge.class)) {
+                    if (field.isAnnotationPresent(Translation.class)) {
+                        Translation annotation = field.getAnnotation(Translation.class);
+                        diField.setValue(messageProvider.getMessage(field.getType(), annotation.value(), annotation.english()));
+                    } else if (field.isAnnotationPresent(Gauge.class)) {
                         class GaugePlotter extends Metrics.Plotter implements GaugeStat {
 
                             public GaugePlotter(String name) {

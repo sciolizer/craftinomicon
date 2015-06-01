@@ -1,6 +1,7 @@
 package name.ball.joshua.craftinomicon.recipe;
 
 import name.ball.joshua.craftinomicon.di.Inject;
+import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.Material;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,6 +17,9 @@ public class RecipeScreen implements Screen {
     @Inject private MenuUtilsFactory menuUtilsFactory;
     @Inject private RecipeMenuItems recipeMenuItems;
     @Inject private RecipeScreenFactory recipeScreenFactory;
+    @Translation(value = "type.crafting", english = "The above recipe is for placing in a crafting grid.") String craftingGridTranslation;
+    @Translation(value = "type.furnace", english = "The above recipe is for placing in a furnace.") String furnaceTranslation;
+    @Translation(value = "navigation.back", english = "Back") String backTranslation;
 
     protected List<MaterialRecipes.IconifiedRecipe> recipes;
     protected int offset;
@@ -39,7 +43,7 @@ public class RecipeScreen implements Screen {
         RecipeAcceptor.accept(recipe, new RecipeVisitor<Void>() {
             @Override
             public Void visit(ShapedRecipe shapedRecipe) {
-                showType(menu, Material.WORKBENCH, "The above recipe is for placing in a crafting grid.");
+                showType(menu, Material.WORKBENCH, craftingGridTranslation);
 
                 int row = 0;
                 String[] sh = shapedRecipe.getShape();
@@ -65,7 +69,7 @@ public class RecipeScreen implements Screen {
 
             @Override
             public Void visit(ShapelessRecipe shapelessRecipe) {
-                showType(menu, Material.WORKBENCH, "The above recipe is for placing in a crafting grid.");
+                showType(menu, Material.WORKBENCH, craftingGridTranslation);
 
                 int i = 0;
                 for (ItemStack ingredient : shapelessRecipe.getIngredientList()) {
@@ -77,7 +81,7 @@ public class RecipeScreen implements Screen {
 
             @Override
             public Void visit(FurnaceRecipe furnaceRecipe) {
-                showType(menu, Material.FURNACE, "The above recipe is for placing in a furnace.");
+                showType(menu, Material.FURNACE, furnaceTranslation);
 
                 setMenuItem(menu, 12, furnaceRecipe.getInput());
                 return null;
@@ -95,7 +99,7 @@ public class RecipeScreen implements Screen {
             menuUtils.addNavigators(offset == 0 ? null : adjacent(offset - 1), offset >= recipes.size() - 1 ? null : adjacent(offset + 1));
         }
         if (menu.historySize() > 1) {
-            menu.setMenuItem(0, new RotationlessMenuItem(menuUtils.sign("Back")) {
+            menu.setMenuItem(0, new RotationlessMenuItem(menuUtils.sign(backTranslation)) {
                 @Override
                 public void onInventoryClick(MenuItemClickEvent menuItemClickEvent) {
                     menuItemClickEvent.getMenu().pop();

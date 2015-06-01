@@ -1,6 +1,8 @@
 package name.ball.joshua.craftinomicon.recipe;
 
 import name.ball.joshua.craftinomicon.di.Inject;
+import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
+import name.ball.joshua.craftinomicon.recipe.i18n.NumericTranslation;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,6 +17,8 @@ public class RecipeMenuItems {
 
     @Inject private RecipeSnapshot recipeSnapshot;
     @Inject private RecipeScreenFactory recipeScreenFactory;
+    @Translation(value = "recipe-click.num-recipes", english = "${num-recipes} recipes (Left-click)") NumericTranslation numRecipesTranslation;
+    @Translation(value = "usage-click.num-usages", english = "${num-usages} usages (Right-click)") NumericTranslation numUsagesTranslation;
 
     public MenuItem getRecipeMenuItem(ItemStack itemStack) {
         return getRecipeMenuItem(Collections.singletonList(itemStack));
@@ -68,11 +72,11 @@ public class RecipeMenuItems {
         List<String> lore = new ArrayList<String>(2);
         int numRecipes = materialRecipes.getRecipes().size();
         if (numRecipes > 0) {
-            lore.add(numRecipes + " " + pluralize("recipe", numRecipes) + " (Left-click)");
+            lore.add(numRecipesTranslation.getMessage(numRecipes));
         }
         int numUsages = materialRecipes.getUsages().size();
         if (numUsages > 0) {
-            lore.add(numUsages + " " + pluralize("usage", numUsages) + " (Right-click)");
+            lore.add(numUsagesTranslation.getMessage(numUsages));
         }
         ItemMeta itemMeta = itemStack.getItemMeta();
         // todo: sometimes itemMeta can be null?!
@@ -80,10 +84,6 @@ public class RecipeMenuItems {
         ItemStack lorifiedItemStack = itemStack.clone();
         lorifiedItemStack.setItemMeta(itemMeta);
         return lorifiedItemStack;
-    }
-
-    private String pluralize(String word, int num) {
-        return word + (num == 1 ? "" : "s");
     }
 
 }
