@@ -1,3 +1,5 @@
 name: craftinomicon
+description: Browsable recipe index
 main: name.ball.joshua.craftinomicon.Craftinomicon
-version: 0.1
+version: ${project.version}
+author: sciolizer
