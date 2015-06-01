@@ -6,13 +6,30 @@ import java.util.*;
 public class DI {
 
     private final Map<Class<?>,Provider<?>> providers;
+    private final DIVisitor diVisitor;
     private Map<Class<?>,Object> instances = new LinkedHashMap<Class<?>, Object>();
 
     public DI() {
-        this(Collections.<Class<?>,Provider<?>>emptyMap());
+        this(new DIVisitor() {
+            @Override
+            public void visitField(DIField field) {
+
+            }
+        }, Collections.<Class<?>, Provider<?>>emptyMap());
     }
-    public DI(Map<Class<?>, Provider<?>> providers) {
+
+    public DI(DIVisitor diVisitor, Map<Class<?>, Provider<?>> providers) {
+        this.diVisitor = diVisitor;
         this.providers = providers;
+    }
+
+    public interface DIVisitor {
+        void visitField(DIField field);
+    }
+
+    public interface DIField {
+        Field getField();
+        void setValue(Object instance);
     }
 
     public void injectMembers(Object o) {
@@ -35,16 +52,28 @@ public class DI {
     }
 
     private Map<Field,Object> buildFieldMap(List<Class<?>> constructing, Class<?> aClass) throws Exception {
-        Map<Field,Object> result = new LinkedHashMap<Field, Object>();
+        final Map<Field,Object> result = new LinkedHashMap<Field, Object>();
         do {
             Field[] declaredFields = aClass.getDeclaredFields();
             if (declaredFields != null) {
-                for (Field field : declaredFields) {
+                for (final Field field : declaredFields) {
                     if (field.isAnnotationPresent(Inject.class)) {
                         field.setAccessible(true);
                         Object instance = getInstance(add(constructing, aClass), field.getType());
                         result.put(field, instance);
                     }
+                    diVisitor.visitField(new DIField() {
+                        @Override
+                        public Field getField() {
+                            return field;
+                        }
+
+                        @Override
+                        public void setValue(Object instance) {
+                            field.setAccessible(true);
+                            result.put(field, instance);
+                        }
+                    });
                 }
             }
         } while ((aClass = aClass.getSuperclass()) != Object.class && aClass != null);

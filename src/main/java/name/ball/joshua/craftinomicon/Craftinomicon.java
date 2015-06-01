@@ -22,7 +22,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Craftinomicon extends JavaPlugin {
 
@@ -36,7 +38,8 @@ public class Craftinomicon extends JavaPlugin {
     public void onEnable() {
 //        new CraftinomiconTestRunner().runTests();
 
-        final DI di = getDI();
+        DIGetter diGetter = new DIGetter();
+        final DI di = diGetter.getDI();
         di.injectMembers(this);
 
         final PluginManager pm = this.getServer().getPluginManager();
@@ -110,15 +113,24 @@ public class Craftinomicon extends JavaPlugin {
 
     public static final String RECIPE_BOOK_DISPLAY_NAME = "Craftinomicon";
 
-    private DI getDI() {
-        Map<Class<?>, DI.Provider<?>> providers = new LinkedHashMap<Class<?>, DI.Provider<?>>();
-        providers.put(Plugin.class, new DI.Provider<Plugin>() {
-            @Override
-            public Plugin get() {
-                return Craftinomicon.this;
-            }
-        });
-        return new DI(providers);
+    private class DIGetter {
+
+        DI getDI() {
+            Map<Class<?>, DI.Provider<?>> providers = new LinkedHashMap<Class<?>, DI.Provider<?>>();
+            providers.put(Plugin.class, new DI.Provider<Plugin>() {
+                @Override
+                public Plugin get() {
+                    return Craftinomicon.this;
+                }
+            });
+            DI.DIVisitor visitor = new DI.DIVisitor() {
+                @Override
+                public void visitField(DI.DIField diField) {
+                }
+            };
+            return new DI(visitor, providers);
+        }
+
     }
 
 }
