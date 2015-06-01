@@ -48,7 +48,7 @@ public class Craftinomicon extends JavaPlugin {
     }
 
     public void onEnable() {
-//        new CraftinomiconTestRunner().runTests();
+//        new CraftinomiconTestRunner().runTests(); // todo: re-enable
 
         saveDefaultConfig();
         FileConfiguration config = getConfig();

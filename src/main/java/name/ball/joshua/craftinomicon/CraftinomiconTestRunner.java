@@ -24,6 +24,7 @@ public class CraftinomiconTestRunner {
 
     public void runTestsThrowing() throws Exception {
         try {
+            // todo: maybe run this check not on the main thread? it might require a dns lookup, which is slow
             if (!"kenodayroll-lm".equals(InetAddress.getLocalHost().getHostName())) {
                 return;
             }
