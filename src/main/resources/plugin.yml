@@ -5,3 +5,6 @@ version: ${project.version}
 author: sciolizer
 
 permissions:
+  craftinomicon.craft.book:
+    description: Grants the ability to craft the craftinomicon.
+    default: true

@@ -15,11 +15,13 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
@@ -40,6 +42,7 @@ public class Craftinomicon extends JavaPlugin {
     @Inject private MaterialDataSubstitutes materialDataSubstitutes;
     @Inject private RecipeBrowser recipeBrowser;
     @Inject private RecipeSnapshot recipeSnapshot;
+    @PermissionKey("craftinomicon.craft.book") private Permission craftingPermission;
 
     public void onDisable() {
     }
@@ -103,14 +106,26 @@ public class Craftinomicon extends JavaPlugin {
         class RecipeBookCraftingInterceptor implements Listener {
             @EventHandler
             public void convertToRecipeBook(PrepareItemCraftEvent event) {
-                Recipe recipe = event.getInventory().getRecipe();
+                CraftingInventory inventory = event.getInventory();
+                Recipe recipe = inventory.getRecipe();
                 if (recipe instanceof ShapelessRecipe) {
                     ShapelessRecipe shapelessRecipe = (ShapelessRecipe) recipe;
                     List<ItemStack> ingredientList = shapelessRecipe.getIngredientList();
-                    if (ingredientList.size() == 2 && ingredientList.get(1).getType().equals(Material.WORKBENCH)) {
+                    if (ingredientList.size() == 2 && ingredientList.get(1).getType().equals(Material.WORKBENCH)) { // todo: write a unit test that makes sure that BOOK always occurs before WORKBENCH
                         ItemStack firstIngredient = ingredientList.get(0);
                         if (Material.BOOK.equals(firstIngredient.getType()) && !isRecipeBook(firstIngredient)) {
-                            event.getInventory().setResult(recipeBookItem);
+                            boolean hasPermissionToCraft = false;
+                            for (HumanEntity viewer : event.getViewers()) {
+                                if (viewer.hasPermission(craftingPermission)) {
+                                    hasPermissionToCraft = true;
+                                    break;
+                                }
+                            }
+                            if (hasPermissionToCraft) {
+                                inventory.setResult(recipeBookItem);
+                            } else {
+                                inventory.setResult(null);
+                            }
                         }
                     }
                 }
