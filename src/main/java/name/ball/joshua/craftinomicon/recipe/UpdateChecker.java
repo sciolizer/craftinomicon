@@ -39,7 +39,7 @@ public class UpdateChecker implements Listener, InitializingBean {
 
     ReaderProvider readerProvider;
     private String thisVersionStr = null;
-    private int[] thisVersion = null;
+    private long[] thisVersion = null;
 
     AsynchronousRunnableExecutor asynchronousRunnableExecutor = new AsynchronousRunnableExecutor() {
         @Override
@@ -165,7 +165,7 @@ public class UpdateChecker implements Listener, InitializingBean {
             boolean updateAvailable = false;
             int unparseableVersionExceptions = 0;
             for (APIFile apiFile : apiFiles) {
-                int[] v;
+                long[] v;
                 try {
                     v = version(apiFile.name);
                 } catch (UnparseableVersionException e) {
@@ -198,8 +198,8 @@ public class UpdateChecker implements Listener, InitializingBean {
             }
         }
 
-        private Collection<? extends PlannedFeature> features(int[] version) {
-            int code = version[3];
+        private Collection<? extends PlannedFeature> features(long[] version) {
+            long code = version[3];
             if (!has(code, PlannedFeature.SHOW_SOMETHING)) {
                 return Collections.emptyList();
             }
@@ -213,12 +213,12 @@ public class UpdateChecker implements Listener, InitializingBean {
             return result;
         }
 
-        private boolean has(int code, PlannedFeature plannedFeature) {
+        private boolean has(long code, PlannedFeature plannedFeature) {
             long mask = 1l << plannedFeature.bit;
             return (code & mask) == mask;
         }
 
-        private boolean moreRecent(int[] candidateVersion) {
+        private boolean moreRecent(long[] candidateVersion) {
             for (int i = 0; i < 4; i++) {
                 if (candidateVersion[i] > thisVersion[i]) {
                     return true;
@@ -236,7 +236,7 @@ public class UpdateChecker implements Listener, InitializingBean {
         private String name;
     }
 
-    private int[] version(String name) throws UnparseableVersionException {
+    private long[] version(String name) throws UnparseableVersionException {
         Matcher matcher = JAR_NAME_PATTERN.matcher(name);
         if (matcher.find()) {
             String group = matcher.group(1);
@@ -246,18 +246,18 @@ public class UpdateChecker implements Listener, InitializingBean {
         }
     }
 
-    private int[] parseVersion(String group) throws UnparseableVersionException {
+    private long[] parseVersion(String group) throws UnparseableVersionException {
         String[] split = group.split("\\.");
         if (split.length == 0) {
             throw new UnparseableVersionException(); // wut?
         }
-        int[] result = new int[4];
+        long[] result = new long[4];
         for (int i = 1; i <= 4; i++) {
             if (split.length < i) {
                 break;
             }
             try {
-                result[i - 1] = Integer.parseInt(split[i - 1]);
+                result[i - 1] = Long.parseLong(split[i - 1]);
             } catch (NumberFormatException e) {
                 throw new UnparseableVersionException();
             }
@@ -274,7 +274,7 @@ public class UpdateChecker implements Listener, InitializingBean {
     static enum PlannedFeature {
         SHOW_SOMETHING(0, ""),
         BUG_FIXES(1, "Bug fixes!"),
-        ADDITIONAL_FEATURES(2, "Additional new features not listed here!"), // special case, changes to "New features", if no PlannedFeatures are marked
+        ADDITIONAL_FEATURES(2, "Additional new features not listed here!"), // special case, changes to "New features", if no PlannedFeatures are marked; todo: iterate up to 64 beginning after the highest enum value. If any of those bits are set, assume ADDITIONAL_FEATURES
         POTIONS(5, "Potions!"),
         MOB_DROPS(6, "Mob drops!"),
         MATERIAL_HARDNESS(7, "Minimum pickaxe level required!"),
@@ -302,7 +302,8 @@ public class UpdateChecker implements Listener, InitializingBean {
         LANGUAGE_POLISH(29, "Polish language option!"),
         LANGUAGE_RUSSIAN(30, "Russian language option!"),
         LANGUAGE_SPANISH(31, "Spanish language option!"),
-        AUTOMATIC_UPGRADES(32, "Automatic plugin upgrades!");
+        AUTOMATIC_UPGRADES(32, "Automatic plugin upgrades!"),
+        UI_IMPROVEMENTS(33, "UI improvements");
 
         final int bit;
         private final String englishDescription;
