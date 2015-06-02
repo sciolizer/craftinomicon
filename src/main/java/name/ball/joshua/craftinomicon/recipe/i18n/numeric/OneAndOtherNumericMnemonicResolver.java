@@ -2,7 +2,7 @@ package name.ball.joshua.craftinomicon.recipe.i18n.numeric;
 
 import name.ball.joshua.craftinomicon.recipe.i18n.NumericMnemonicResolver;
 
-public class EnglishNumericMnemonicResolver implements NumericMnemonicResolver {
+public class OneAndOtherNumericMnemonicResolver implements NumericMnemonicResolver {
 
     @Override
     public Mnemonic resolve(int n) {
