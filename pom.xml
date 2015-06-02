@@ -5,7 +5,7 @@
     <groupId>name.ball.joshua.craftinomicon</groupId>
     <artifactId>craftinomicon</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.2.4194305</version>
+    <version>0.2.3-SNAPSHOT</version>
     <name>craftinomicon</name>
     <url>http://maven.apache.org</url>
     <properties>
