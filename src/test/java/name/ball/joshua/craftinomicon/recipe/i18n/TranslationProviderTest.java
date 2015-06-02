@@ -64,9 +64,21 @@ public class TranslationProviderTest {
         assertEquals("2 recipes (Left-click)", new MessageProvider(Locale.ENGLISH).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(2));
     }
 
-    private List<Locale> getLocales() {
-        return Arrays.asList(Locale.ENGLISH, Locale.TRADITIONAL_CHINESE, Locale.SIMPLIFIED_CHINESE);
+    @Test
+    public void testPortugueseSingular() throws Exception {
+        assertEquals("Receita com 1 clique (Botão esquerdo)", new MessageProvider(portugueseLocale).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(1));
     }
+
+    @Test
+    public void testPortuguesePlural() throws Exception {
+        assertEquals("2 receitas (Botão esquerdo)", new MessageProvider(portugueseLocale).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(2));
+    }
+
+    private List<Locale> getLocales() {
+        return Arrays.asList(portugueseLocale, Locale.ENGLISH, Locale.TRADITIONAL_CHINESE, Locale.SIMPLIFIED_CHINESE);
+    }
+
+    private static final Locale portugueseLocale = new Locale("pt", "BR");
 
 //    @Test
 //    public void testAllLocalesMentionedInConfigYml() throws Exception {
