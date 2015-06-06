@@ -78,6 +78,7 @@ public class UpdateChecker implements Listener, InitializingBean {
     public void afterPropertiesSet() throws Exception {
         try {
             thisVersionStr = plugin.getDescription().getVersion();
+            if (thisVersionStr.endsWith("-SNAPSHOT")) thisVersionStr = thisVersionStr.substring(0, thisVersionStr.length() - "-SNAPSHOT".length());
             thisVersion = parseVersion(thisVersionStr); // todo: functional test
         } catch (UnparseableVersionException e) {
             throw new RuntimeException(e);
@@ -231,7 +232,6 @@ public class UpdateChecker implements Listener, InitializingBean {
 
     }
 
-    @SuppressWarnings("UnusedDeclaration") // values set by gson
     private static class APIFile {
         private String name;
     }

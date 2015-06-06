@@ -168,6 +168,24 @@ public class UpdateCheckerTest {
     }
 
     @Test
+    public void testSNAPSHOT() throws Exception {
+        PluginDescriptionFile pluginDescriptionFile = new PluginDescriptionFile(new StringReader("name: craftinomicon\nmain: name.ball.joshua.craftinomicon.Craftinomicon\nversion: 0.2-SNAPSHOT"));
+        when(plugin.getDescription()).thenReturn(pluginDescriptionFile);
+
+        Permissible permissible = mock(Permissible.class);
+        when(permissible.hasPermission(any(Permission.class))).thenReturn(true);
+
+        setApiResponse("0.2.1.37");
+
+        updateChecker.afterPropertiesSet();
+
+        List<String> updateText = updateChecker.getUpdateText(permissible);
+        assertEquals(2, updateText.size());
+        assertEquals("Potions!", updateText.get(0));
+        assertEquals("Additional new features not listed here!", updateText.get(1));
+    }
+
+    @Test
     public void testPlannedFeaturesAllDistinct() throws Exception {
         Set<Integer> bits = new LinkedHashSet<Integer>();
         UpdateChecker.PlannedFeature[] plannedFeatures = UpdateChecker.PlannedFeature.values();
