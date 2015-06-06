@@ -52,7 +52,7 @@ Supported languages
 
 Language can be changed from English by changing the language.code property in `$BUKKIT/plugins/craftinomicon/config.yml`.
 Currently supported languages are English, Simplified Chinese, and Traditional Chinese.
-Add your own translation to the [localization page](http://dev.bukkit.org/bukkit-plugins/craftinomicon/localization/)!
+Add your own translation to the [localization page](http://dev.bukkit.org/bukkit-plugins/craftinomicon/localization/)! If the pluralization is confusing, see my [guide to pluralization](https://github.com/sciolizer/craftinomicon/wiki/Localization).
 
 Permissions
 -----------
