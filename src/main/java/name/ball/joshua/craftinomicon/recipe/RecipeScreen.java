@@ -154,7 +154,11 @@ public class RecipeScreen implements Screen {
                 }
             });
             if (i == offset) {
-                menu.setMenuItem(36 + column, new UnclickableMenuItem(new ItemStack(Material.REDSTONE_TORCH_ON)));
+                ItemStack redstoneTorch = new ItemStack(Material.REDSTONE_TORCH_ON);
+                ItemMeta itemMeta = redstoneTorch.getItemMeta();
+                itemMeta.setDisplayName((offset + 1) + " / " + size);
+                redstoneTorch.setItemMeta(itemMeta);
+                menu.setMenuItem(36 + column, new UnclickableMenuItem(redstoneTorch));
             }
         }
     }
