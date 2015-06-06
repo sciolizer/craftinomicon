@@ -36,11 +36,20 @@ public class RecipeSnapshot {
                 continue;
             }
             SortedSet<ItemStack> ingredients = ingredientsGetter.getIngredients(recipe);
+            if (ingredients.isEmpty()) {
+                continue;
+            }
+            boolean allAir = true;
             for (ItemStack ingredient : ingredients) {
-                if (Material.FIRE.equals(ingredient.getType())) {
+                Material material = ingredient.getType();
+                if (Material.FIRE.equals(material)) {
                     continue recipes; // skip chain armor recipes
                 }
+                if (!Material.AIR.equals(material)) {
+                    allAir = false;
+                }
             }
+            if (allAir) continue; // ReverseCraft introduces some strange recipes
             if (recipe.getResult().getAmount() == 0) {
                 continue; // purple dye crafts into 0 black banners?!
             }
