@@ -4,7 +4,6 @@ import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.Material;
 import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.List;
 
 public class RecipeScreen implements Screen {
 
+    @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private MaterialDataSubstitutes materialDataSubstitutes;
     @Inject private MenuUtilsFactory menuUtilsFactory;
     @Inject private RecipeMenuItems recipeMenuItems;
@@ -112,9 +112,7 @@ public class RecipeScreen implements Screen {
 
     private void showType(Menu menu, Material icon, String displayName) {
         ItemStack itemStack = new ItemStack(icon, 1);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName(displayName);
-        itemStack.setItemMeta(itemMeta);
+        itemMetaManipulator.forItemStack(itemStack).setDisplayName(displayName);
         menu.setMenuItem(30, new UnclickableMenuItem(itemStack));
     }
 
@@ -155,9 +153,7 @@ public class RecipeScreen implements Screen {
             });
             if (i == offset) {
                 ItemStack redstoneTorch = new ItemStack(Material.REDSTONE_TORCH_ON);
-                ItemMeta itemMeta = redstoneTorch.getItemMeta();
-                itemMeta.setDisplayName((offset + 1) + " / " + size);
-                redstoneTorch.setItemMeta(itemMeta);
+                itemMetaManipulator.forItemStack(redstoneTorch).setDisplayName((offset + 1) + " / " + size);
                 menu.setMenuItem(36 + column, new UnclickableMenuItem(redstoneTorch));
             }
         }

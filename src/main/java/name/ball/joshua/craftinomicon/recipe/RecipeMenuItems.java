@@ -1,11 +1,10 @@
 package name.ball.joshua.craftinomicon.recipe;
 
 import name.ball.joshua.craftinomicon.di.Inject;
-import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import name.ball.joshua.craftinomicon.recipe.i18n.NumericTranslation;
+import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
@@ -15,6 +14,7 @@ import java.util.Set;
 
 public class RecipeMenuItems {
 
+    @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private RecipeSnapshot recipeSnapshot;
     @Inject private RecipeScreenFactory recipeScreenFactory;
     @Translation(value = "recipe-click.num-recipes", english = "${num-recipes} recipes (Left-click)") NumericTranslation numRecipesTranslation;
@@ -69,7 +69,7 @@ public class RecipeMenuItems {
 
     private ItemStack attachLore(ItemStack itemStack) {
         MaterialRecipes materialRecipes = recipeSnapshot.getMaterialRecipes(itemStack.getData());
-        List<String> lore = new ArrayList<String>(2);
+        final List<String> lore = new ArrayList<String>(2);
         int numRecipes = materialRecipes.getRecipes().size();
         if (numRecipes > 0) {
             lore.add(numRecipesTranslation.getMessage(numRecipes));
@@ -78,11 +78,14 @@ public class RecipeMenuItems {
         if (numUsages > 0) {
             lore.add(numUsagesTranslation.getMessage(numUsages));
         }
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        // todo: sometimes itemMeta can be null?!
-        itemMeta.setLore(lore);
         ItemStack lorifiedItemStack = itemStack.clone();
-        lorifiedItemStack.setItemMeta(itemMeta);
+        itemMetaManipulator.forItemStack(lorifiedItemStack).manipulate(new ItemMetaManipulator.Manipulation<Void>() {
+            @Override
+            public Void manipulate(ItemMetaManipulator.ManipulableItemMeta itemMeta) {
+                itemMeta.addLore(lore);
+                return null;
+            }
+        });
         return lorifiedItemStack;
     }
 

@@ -1,11 +1,9 @@
 package name.ball.joshua.craftinomicon;
 
+import com.google.common.base.Optional;
 import name.ball.joshua.craftinomicon.di.DI;
 import name.ball.joshua.craftinomicon.di.Inject;
-import name.ball.joshua.craftinomicon.recipe.MaterialDataSubstitutes;
-import name.ball.joshua.craftinomicon.recipe.PermissionKey;
-import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
-import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
+import name.ball.joshua.craftinomicon.recipe.*;
 import name.ball.joshua.craftinomicon.recipe.i18n.MessageProvider;
 import name.ball.joshua.craftinomicon.recipe.i18n.TitleTranslationProvider;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
@@ -26,7 +24,6 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -40,6 +37,7 @@ import java.util.*;
 
 public class Craftinomicon extends JavaPlugin {
 
+    @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private MaterialDataSubstitutes materialDataSubstitutes;
     @Inject private RecipeBrowser recipeBrowser;
     @Inject private RecipeSnapshot recipeSnapshot;
@@ -95,9 +93,7 @@ public class Craftinomicon extends JavaPlugin {
         final PluginManager pm = this.getServer().getPluginManager();
 
         final ItemStack recipeBookItem = new ItemStack(Material.BOOK);
-        ItemMeta itemMeta = recipeBookItem.getItemMeta();
-        itemMeta.setDisplayName(titleTranslation);
-        recipeBookItem.setItemMeta(itemMeta);
+        itemMetaManipulator.forItemStack(recipeBookItem).setDisplayName(titleTranslation);
 
         ShapelessRecipe recipeBookRecipe = new ShapelessRecipe(recipeBookItem);
         recipeBookRecipe.addIngredient(Material.BOOK);
@@ -168,12 +164,12 @@ public class Craftinomicon extends JavaPlugin {
     }
 
     protected boolean isRecipeBook(ItemStack itemStack) {
-        if (!Material.BOOK.equals(itemStack.getType()) || !itemStack.hasItemMeta()) return false;
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (!Material.BOOK.equals(itemStack.getType())) return false;
+        Optional<String> displayName = itemMetaManipulator.forItemStack(itemStack).getDisplayName();
         // It's possible that the Craftinomicon was crafted when the server was configured in a different
         // language, so we have to check if the display name of the book is ANY of the translations of
         // "Craftinomicon".
-        return itemMeta.hasDisplayName() && titleTranslationProvider.getPossibleTitles().contains(itemMeta.getDisplayName());
+        return displayName.isPresent() && titleTranslationProvider.getPossibleTitles().contains(displayName.get());
     }
 
     private class DIGetter {

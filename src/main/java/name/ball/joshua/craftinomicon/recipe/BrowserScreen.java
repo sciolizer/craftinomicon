@@ -4,15 +4,14 @@ import name.ball.joshua.craftinomicon.di.InitializingBean;
 import name.ball.joshua.craftinomicon.di.Inject;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BrowserScreen implements Screen, InitializingBean {
 
     @Inject private BrowserScreenFactory browserScreenFactory;
+    @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private RecipeMenuItems recipeMenuItems;
     @Inject private MenuUtilsFactory menuUtilsFactory;
     @Inject private RecipeSnapshot recipeSnapshot;
@@ -58,16 +57,17 @@ public class BrowserScreen implements Screen, InitializingBean {
         MenuUtils menuUtils = menuUtilsFactory.newMenuUtils(menu);
         menuUtils.addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1, player), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1, player));
 
-        List<String> updateText = updateChecker.getUpdateText(player);
+        final List<String> updateText = updateChecker.getUpdateText(player);
         if (updateText != null) {
             ItemStack sign = menuUtils.sign("New version of craftinomicon available! Click to see link.");
             if (updateText.size() > 0) {
-                ItemMeta itemMeta = sign.getItemMeta();
-                List<String> lore = itemMeta.getLore();
-                if (lore == null) lore = new ArrayList<String>();
-                lore.addAll(updateText);
-                itemMeta.setLore(lore);
-                sign.setItemMeta(itemMeta);
+                itemMetaManipulator.forItemStack(sign).manipulate(new ItemMetaManipulator.Manipulation<Void>() {
+                    @Override
+                    public Void manipulate(ItemMetaManipulator.ManipulableItemMeta itemMeta) {
+                        itemMeta.addLore(updateText);
+                        return null;
+                    }
+                });
             }
             menu.setMenuItem(49, new RotationlessMenuItem(sign) {
                 @Override

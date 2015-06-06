@@ -1,13 +1,15 @@
 package name.ball.joshua.craftinomicon.recipe;
 
+import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class MenuUtils {
 
     private Menu menu;
+
+    @Inject private ItemMetaManipulator itemMetaManipulator;
 
     @Translation(value = "navigation.previous", english = "Previous") String previousTranslation;
     @Translation(value = "navigation.next", english = "Next") String nextTranslation;
@@ -36,9 +38,7 @@ public class MenuUtils {
 
     public ItemStack sign(String displayText) {
         ItemStack sign = new ItemStack(Material.SIGN);
-        ItemMeta itemMeta = sign.getItemMeta();
-        itemMeta.setDisplayName(displayText);
-        sign.setItemMeta(itemMeta);
+        itemMetaManipulator.forItemStack(sign).setDisplayName(displayText);
         return sign;
     }
 
