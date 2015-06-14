@@ -4,10 +4,21 @@ main: name.ball.joshua.craftinomicon.Craftinomicon
 version: ${project.version}
 author: sciolizer
 
+commands:
+  craftinomicon:
+    description: With zero arguments ("/craftinomicon"), opens the craftinomicon. With arguments (e.g. "/craftinomicon stick"), searches for items containing the given name.
+    usage: /craftinomicon <item-name>
+    aliases: cr
 permissions:
   craftinomicon.craft.book:
     description: Grants the ability to craft the craftinomicon.
     default: true
   craftinomicon.upgrade.announce:
     description: When a new version of craftinomicon is released, users with this permission enabled will see an extra item in their craftinomicon, letting them know that an upgrade is available. If no user has this permission, then the plugin will not attempt to check for updates.
+    default: op
+  craftinomicon.command.enabled:
+    description: Grants the ability to open and search the craftinomicon with the /craftinomicon command, assuming the player already has the book, or the bookless permission is enabled for that player.
+    default: true
+  craftinomicon.command.bookless:
+    description: Grants the ability to open and search the craftinomicon even if the player does not have a craftinomicon in their inventory. If craftinomicon.command.enabled is false, then this permission is ignored.
     default: op

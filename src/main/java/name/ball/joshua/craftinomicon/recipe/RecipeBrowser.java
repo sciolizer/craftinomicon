@@ -1,11 +1,9 @@
 package name.ball.joshua.craftinomicon.recipe;
 
-import name.ball.joshua.craftinomicon.Craftinomicon;
 import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,6 +11,7 @@ public class RecipeBrowser {
 
     @Inject private BrowserScreenFactory browserScreenFactory;
     @Inject private RecipeMenuItems recipeMenuItems;
+    @Inject private RecipeSnapshot recipeSnapshot;
     @Inject private MenuRegistry menuRegistry;
     @Translation(value = "title", english = "Craftinomicon") String titleTranslation;
 
@@ -21,6 +20,10 @@ public class RecipeBrowser {
     // showing the recipes that take arbitrary kinds of planks
 
     public void showAllItems(HumanEntity player) {
+        showScreen(player, browserScreenFactory.newBrowserScreen(0, player, recipeSnapshot.getAllMaterialsInAtLeastOneRecipe()));
+    }
+
+    public void showScreen(HumanEntity player, Screen screen) {
         final Menu[] menus = new Menu[1];
         menus[0] = menuRegistry.newMenu(player, 54, titleTranslation, new InventoryClickHandler() {
             @Override
@@ -32,9 +35,8 @@ public class RecipeBrowser {
                 }
             }
         });
-        BrowserScreen browserScreen = browserScreenFactory.newBrowserScreen(0, player);
         Menu menu = menus[0];
-        browserScreen.populate(menu);
+        screen.populate(menu);
         menu.open();
     }
 

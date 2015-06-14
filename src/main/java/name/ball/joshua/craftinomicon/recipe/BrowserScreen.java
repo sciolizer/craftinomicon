@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 import java.util.List;
+import java.util.Set;
 
 public class BrowserScreen implements Screen, InitializingBean {
 
@@ -15,21 +16,22 @@ public class BrowserScreen implements Screen, InitializingBean {
     @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private RecipeMenuItems recipeMenuItems;
     @Inject private MenuUtilsFactory menuUtilsFactory;
-    @Inject private RecipeSnapshot recipeSnapshot;
     @Inject private UpdateChecker updateChecker;
 
     private int page;
     private int numPages;
     private HumanEntity player;
+    private Set<MaterialData> stacks;
 
-    public BrowserScreen(int page, HumanEntity player) {
+    public BrowserScreen(int page, HumanEntity player, Set<MaterialData> stacks) {
         this.page = page;
         this.player = player;
+        this.stacks = stacks;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        int size = recipeSnapshot.getAllMaterialsInAtLeastOneRecipe().size();
+        int size = stacks.size();
         numPages = (size - 1) / ITEMS_PER_PAGE + 1;
         while (page < 0) {
             page = page + numPages;
@@ -44,7 +46,7 @@ public class BrowserScreen implements Screen, InitializingBean {
         int offset = page * ITEMS_PER_PAGE;
         int i = 0;
         // todo: use submap feature of sortedmap instead of iterating through each time
-        for (MaterialData materialData : recipeSnapshot.getAllMaterialsInAtLeastOneRecipe()) {
+        for (MaterialData materialData : stacks) {
             if (i >= offset) {
                 int index = i - offset;
                 menu.setMenuItem(index, recipeMenuItems.getRecipeMenuItem(materialData.toItemStack(1)));
@@ -56,7 +58,7 @@ public class BrowserScreen implements Screen, InitializingBean {
         }
 
         MenuUtils menuUtils = menuUtilsFactory.newMenuUtils(menu);
-        menuUtils.addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1, player), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1, player));
+        menuUtils.addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1, player, stacks), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1, player, stacks));
 
         if (player instanceof CommandSender) {
             final List<String> updateText = updateChecker.getUpdateText(player);

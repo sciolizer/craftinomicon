@@ -1,11 +1,9 @@
 package name.ball.joshua.craftinomicon;
 
-import com.google.common.base.Optional;
 import name.ball.joshua.craftinomicon.di.DI;
 import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.*;
 import name.ball.joshua.craftinomicon.recipe.i18n.MessageProvider;
-import name.ball.joshua.craftinomicon.recipe.i18n.TitleTranslationProvider;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import name.ball.joshua.craftinomicon.recipe.metrics.Gauge;
 import name.ball.joshua.craftinomicon.recipe.metrics.GaugeStat;
@@ -37,11 +35,12 @@ import java.util.*;
 
 public class Craftinomicon extends JavaPlugin {
 
+    @Inject private CraftinomiconCommandExecutor craftinomiconCommandExecutor;
     @Inject private ItemMetaManipulator itemMetaManipulator;
     @Inject private MaterialDataSubstitutes materialDataSubstitutes;
+    @Inject private RecipeBookChecker recipeBookChecker;
     @Inject private RecipeBrowser recipeBrowser;
     @Inject private RecipeSnapshot recipeSnapshot;
-    @Inject private TitleTranslationProvider titleTranslationProvider;
     @PermissionKey("craftinomicon.craft.book") private Permission craftingPermission;
     @Translation(value = "title", english = "Craftinomicon") String titleTranslation;
 
@@ -112,7 +111,7 @@ public class Craftinomicon extends JavaPlugin {
                     List<ItemStack> ingredientList = shapelessRecipe.getIngredientList();
                     if (ingredientList.size() == 2 && ingredientList.get(1).getType().equals(Material.WORKBENCH)) { // todo: write a unit test that makes sure that BOOK always occurs before WORKBENCH
                         ItemStack firstIngredient = ingredientList.get(0);
-                        if (Material.BOOK.equals(firstIngredient.getType()) && !isRecipeBook(firstIngredient)) {
+                        if (Material.BOOK.equals(firstIngredient.getType()) && !recipeBookChecker.isRecipeBook(firstIngredient)) {
                             boolean hasPermissionToCraft = false;
                             for (HumanEntity viewer : event.getViewers()) {
                                 if (viewer.hasPermission(craftingPermission)) {
@@ -140,13 +139,15 @@ public class Craftinomicon extends JavaPlugin {
                     case RIGHT_CLICK_AIR:
                     case RIGHT_CLICK_BLOCK:
                         ItemStack itemInHand = event.getPlayer().getItemInHand();
-                        if (isRecipeBook(itemInHand)) {
+                        if (recipeBookChecker.isRecipeBook(itemInHand)) {
                             recipeBrowser.showAllItems(event.getPlayer());
                         }
                 }
             }
         }
         pm.registerEvents(new RecipeBookConsumeEventHandler(), this);
+
+        getCommand("craftinomicon").setExecutor(craftinomiconCommandExecutor);
 
         // We don't want to construct the recipe index until after the other plugins have loaded and had a chance
         // to register their recipes.
@@ -161,15 +162,6 @@ public class Craftinomicon extends JavaPlugin {
                 }
             }
         }.runTask(this);
-    }
-
-    protected boolean isRecipeBook(ItemStack itemStack) {
-        if (!Material.BOOK.equals(itemStack.getType())) return false;
-        Optional<String> displayName = itemMetaManipulator.forItemStack(itemStack).getDisplayName();
-        // It's possible that the Craftinomicon was crafted when the server was configured in a different
-        // language, so we have to check if the display name of the book is ANY of the translations of
-        // "Craftinomicon".
-        return displayName.isPresent() && titleTranslationProvider.getPossibleTitles().contains(displayName.get());
     }
 
     private class DIGetter {
