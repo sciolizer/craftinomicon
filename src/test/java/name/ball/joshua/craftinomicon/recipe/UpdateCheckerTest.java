@@ -1,6 +1,5 @@
 package name.ball.joshua.craftinomicon.recipe;
 
-import com.google.gson.Gson;
 import name.ball.joshua.craftinomicon.recipe.metrics.GaugeStat;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.*;
 
 public class UpdateCheckerTest {
     
-    private Gson gson = new Gson();
     @Mock private Plugin plugin;
     @Mock private Permission upgradePermission;
     @Mock private GaugeStat malformedURLException;
@@ -40,7 +38,6 @@ public class UpdateCheckerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         updateChecker = new UpdateChecker() {{
-            gson = UpdateCheckerTest.this.gson;
             plugin = UpdateCheckerTest.this.plugin;
             upgradePermission = UpdateCheckerTest.this.upgradePermission;
             malformedURLException = UpdateCheckerTest.this.malformedURLException;
