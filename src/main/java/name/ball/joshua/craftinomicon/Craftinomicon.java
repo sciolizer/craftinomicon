@@ -7,6 +7,7 @@ import name.ball.joshua.craftinomicon.recipe.PermissionKey;
 import name.ball.joshua.craftinomicon.recipe.RecipeBrowser;
 import name.ball.joshua.craftinomicon.recipe.RecipeSnapshot;
 import name.ball.joshua.craftinomicon.recipe.i18n.MessageProvider;
+import name.ball.joshua.craftinomicon.recipe.i18n.TitleTranslationProvider;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import name.ball.joshua.craftinomicon.recipe.metrics.Gauge;
 import name.ball.joshua.craftinomicon.recipe.metrics.GaugeStat;
@@ -42,7 +43,9 @@ public class Craftinomicon extends JavaPlugin {
     @Inject private MaterialDataSubstitutes materialDataSubstitutes;
     @Inject private RecipeBrowser recipeBrowser;
     @Inject private RecipeSnapshot recipeSnapshot;
+    @Inject private TitleTranslationProvider titleTranslationProvider;
     @PermissionKey("craftinomicon.craft.book") private Permission craftingPermission;
+    @Translation(value = "title", english = "Craftinomicon") String titleTranslation;
 
     public void onDisable() {
     }
@@ -93,7 +96,7 @@ public class Craftinomicon extends JavaPlugin {
 
         final ItemStack recipeBookItem = new ItemStack(Material.BOOK);
         ItemMeta itemMeta = recipeBookItem.getItemMeta();
-        itemMeta.setDisplayName(RECIPE_BOOK_DISPLAY_NAME);
+        itemMeta.setDisplayName(titleTranslation);
         recipeBookItem.setItemMeta(itemMeta);
 
         ShapelessRecipe recipeBookRecipe = new ShapelessRecipe(recipeBookItem);
@@ -167,10 +170,11 @@ public class Craftinomicon extends JavaPlugin {
     protected boolean isRecipeBook(ItemStack itemStack) {
         if (!Material.BOOK.equals(itemStack.getType()) || !itemStack.hasItemMeta()) return false;
         ItemMeta itemMeta = itemStack.getItemMeta();
-        return itemMeta.hasDisplayName() && RECIPE_BOOK_DISPLAY_NAME.equals(itemMeta.getDisplayName());
+        // It's possible that the Craftinomicon was crafted when the server was configured in a different
+        // language, so we have to check if the display name of the book is ANY of the translations of
+        // "Craftinomicon".
+        return itemMeta.hasDisplayName() && titleTranslationProvider.getPossibleTitles().contains(itemMeta.getDisplayName());
     }
-
-    public static final String RECIPE_BOOK_DISPLAY_NAME = "Craftinomicon";
 
     private class DIGetter {
 
