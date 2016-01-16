@@ -2,7 +2,6 @@ package name.ball.joshua.craftinomicon.recipe.i18n;
 
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class TranslationProviderTest {
+public class TranslationProviderTest implements Locales {
 
     @Test
     public void testAllLocalesHaveSameKeysAndOfSameType() throws Exception {
@@ -75,10 +74,9 @@ public class TranslationProviderTest {
     }
 
     private List<Locale> getLocales() {
-        return Arrays.asList(portugueseLocale, Locale.ENGLISH, Locale.TRADITIONAL_CHINESE, Locale.SIMPLIFIED_CHINESE);
+        return SUPPORTED_LOCALES;
     }
 
-    private static final Locale portugueseLocale = new Locale("pt", "BR");
 
 //    @Test
 //    public void testAllLocalesMentionedInConfigYml() throws Exception {
