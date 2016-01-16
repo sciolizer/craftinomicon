@@ -13,6 +13,7 @@ public interface Locales {
             portugueseLocale,
             russianLocale,
             Locale.ENGLISH,
+            Locale.GERMANY,
             Locale.TRADITIONAL_CHINESE,
             Locale.SIMPLIFIED_CHINESE);;
 

@@ -86,10 +86,14 @@ public class TranslationProviderTest implements Locales {
         assertEquals("Назад", russianMessageProvider.getMessage(String.class, "navigation.back", "Back"));
     }
 
+    @Test
+    public void testGerman() throws Exception {
+        assertEquals("Zurück", new MessageProvider(Locale.GERMANY).getMessage(String.class, "navigation.back", "Back"));
+    }
+
     private List<Locale> getLocales() {
         return SUPPORTED_LOCALES;
     }
-
 
 //    @Test
 //    public void testAllLocalesMentionedInConfigYml() throws Exception {

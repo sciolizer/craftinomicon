@@ -17,6 +17,8 @@ public class UTF8Control extends ResourceBundle.Control {
     {
         if (Locale.ENGLISH.equals(locale)) {
             locale = Locale.ROOT;
+        } else if (new Locale("de").equals(locale)) {
+            locale = Locale.GERMANY; // for some reason java is changing the de_DE into a de, so we change it back
         }
         // The below is a copy of the default implementation.
         String bundleName = toBundleName(baseName, locale);
