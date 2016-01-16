@@ -1,6 +1,7 @@
 # Valid values for language.code are
 #   pt_BR  - Brazilian Portuguese
 #   en     - English
+#   ru_RU  - Russian
 #   zh_CN  - Simplified Chinese
 #   zh_TW  - Traditional Chinese
 # If an invalid code is provided, it will default to English.

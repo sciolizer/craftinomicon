@@ -73,6 +73,19 @@ public class TranslationProviderTest implements Locales {
         assertEquals("2 receitas (Botão esquerdo)", new MessageProvider(portugueseLocale).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(2));
     }
 
+    @Test
+    public void testRussian() throws Exception {
+        MessageProvider russianMessageProvider = new MessageProvider(russianLocale);
+        NumericTranslation translation = russianMessageProvider.getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)");
+        assertEquals("1 рецепт (ЛКМ левый клик мыши)", translation.getMessage(1));
+        assertEquals("21 рецепт (ЛКМ левый клик мыши)", translation.getMessage(21));
+        assertEquals("2 рецепта (ЛКМ левый клик мыши)", translation.getMessage(2));
+        assertEquals("0 рецептов (ЛКМ левый клик мыши)", translation.getMessage(0));
+        // other is only for fractional values, I'm guessing, which we don't have in the plugin
+
+        assertEquals("Назад", russianMessageProvider.getMessage(String.class, "navigation.back", "Back"));
+    }
+
     private List<Locale> getLocales() {
         return SUPPORTED_LOCALES;
     }
