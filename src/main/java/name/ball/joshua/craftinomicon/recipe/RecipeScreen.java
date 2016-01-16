@@ -7,6 +7,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class RecipeScreen implements Screen {
         Recipe recipe = this.recipes.get(this.offset).getRecipe();
 
         menu.setMenuItem(15, recipeMenuItems.getRecipeMenuItem(recipe.getResult()));
+
+        for (Integer index : Arrays.asList(1, 5, 10, 14, 19, 23, 28, 29, 31, 32)) {
+            menu.setMenuItem(index, new UnclickableMenuItem(new ItemStack(Material.STAINED_GLASS_PANE)));
+        }
 
         RecipeAcceptor.accept(recipe, new RecipeVisitor<Void>() {
             @Override
