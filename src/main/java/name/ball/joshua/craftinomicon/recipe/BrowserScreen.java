@@ -3,6 +3,7 @@ package name.ball.joshua.craftinomicon.recipe;
 import name.ball.joshua.craftinomicon.di.InitializingBean;
 import name.ball.joshua.craftinomicon.di.Inject;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
@@ -19,9 +20,9 @@ public class BrowserScreen implements Screen, InitializingBean {
 
     private int page;
     private int numPages;
-    private CommandSender player;
+    private HumanEntity player;
 
-    public BrowserScreen(int page, CommandSender player) {
+    public BrowserScreen(int page, HumanEntity player) {
         this.page = page;
         this.player = player;
     }
@@ -57,24 +58,26 @@ public class BrowserScreen implements Screen, InitializingBean {
         MenuUtils menuUtils = menuUtilsFactory.newMenuUtils(menu);
         menuUtils.addNavigators(page == 0 ? null : browserScreenFactory.newBrowserScreen(page - 1, player), page >= numPages - 1 ? null : browserScreenFactory.newBrowserScreen(page + 1, player));
 
-        final List<String> updateText = updateChecker.getUpdateText(player);
-        if (updateText != null) {
-            ItemStack sign = menuUtils.sign("New version of craftinomicon available! Click to see link.");
-            if (updateText.size() > 0) {
-                itemMetaManipulator.forItemStack(sign).manipulate(new ItemMetaManipulator.Manipulation<Void>() {
+        if (player instanceof CommandSender) {
+            final List<String> updateText = updateChecker.getUpdateText(player);
+            if (updateText != null) {
+                ItemStack sign = menuUtils.sign("New version of craftinomicon available! Click to see link.");
+                if (updateText.size() > 0) {
+                    itemMetaManipulator.forItemStack(sign).manipulate(new ItemMetaManipulator.Manipulation<Void>() {
+                        @Override
+                        public Void manipulate(ItemMetaManipulator.ManipulableItemMeta itemMeta) {
+                            itemMeta.addLore(updateText);
+                            return null;
+                        }
+                    });
+                }
+                menu.setMenuItem(49, new RotationlessMenuItem(sign) {
                     @Override
-                    public Void manipulate(ItemMetaManipulator.ManipulableItemMeta itemMeta) {
-                        itemMeta.addLore(updateText);
-                        return null;
+                    public void onInventoryClick(MenuItemClickEvent menuItemClickEvent) {
+                        ((CommandSender)player).sendMessage("http://dev.bukkit.org/bukkit-plugins/craftinomicon/");
                     }
                 });
             }
-            menu.setMenuItem(49, new RotationlessMenuItem(sign) {
-                @Override
-                public void onInventoryClick(MenuItemClickEvent menuItemClickEvent) {
-                    player.sendMessage("http://dev.bukkit.org/bukkit-plugins/craftinomicon/");
-                }
-            });
         }
     }
 

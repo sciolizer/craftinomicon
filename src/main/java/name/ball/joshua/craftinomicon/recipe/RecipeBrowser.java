@@ -4,6 +4,7 @@ import name.ball.joshua.craftinomicon.Craftinomicon;
 import name.ball.joshua.craftinomicon.di.Inject;
 import name.ball.joshua.craftinomicon.recipe.i18n.Translation;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +20,7 @@ public class RecipeBrowser {
     // e.g. when looking at usages for jungle wood planks, show the recipe for jungle wood stairs before
     // showing the recipes that take arbitrary kinds of planks
 
-    public void showAllItems(Player player) {
+    public void showAllItems(HumanEntity player) {
         final Menu[] menus = new Menu[1];
         menus[0] = menuRegistry.newMenu(player, 54, titleTranslation, new InventoryClickHandler() {
             @Override

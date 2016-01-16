@@ -1,7 +1,7 @@
 package name.ball.joshua.craftinomicon.recipe;
 
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 
 public interface BrowserScreenFactory {
-    BrowserScreen newBrowserScreen(int page, CommandSender player);
+    BrowserScreen newBrowserScreen(int page, HumanEntity player);
 }
