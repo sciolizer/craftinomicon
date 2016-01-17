@@ -42,7 +42,8 @@ public class RecipeScreen implements Screen {
         menu.setMenuItem(15, recipeMenuItems.getRecipeMenuItem(recipe.getResult()));
 
         for (Integer index : Arrays.asList(1, 5, 10, 14, 19, 23, 28, 29, 31, 32)) {
-            menu.setMenuItem(index, new UnclickableMenuItem(new ItemStack(Material.STAINED_GLASS_PANE)));
+            ItemStack glassPane = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short)1); // orange, http://minecraft.gamepedia.com/Stained_Glass#Data_Values
+            menu.setMenuItem(index, new UnclickableMenuItem(glassPane));
         }
 
         RecipeAcceptor.accept(recipe, new RecipeVisitor<Void>() {
