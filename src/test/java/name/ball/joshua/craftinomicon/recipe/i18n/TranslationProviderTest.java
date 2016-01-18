@@ -45,12 +45,12 @@ public class TranslationProviderTest implements Locales {
 
     @Test
     public void testSimplifiedPrevious() throws Exception {
-        assertEquals("上一个", new MessageProvider(Locale.SIMPLIFIED_CHINESE).getMessage(String.class, "navigation.previous", "Previous"));
+        assertEquals("§7上一页", new MessageProvider(Locale.SIMPLIFIED_CHINESE).getMessage(String.class, "navigation.previous", "Previous"));
     }
 
     @Test
     public void testNumericSimplifiedChinese() throws Exception {
-        assertEquals("1 说明书 (左键)", new MessageProvider(Locale.SIMPLIFIED_CHINESE).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(1));
+        assertEquals("§f1 §7合成方式 (左键查看)", new MessageProvider(Locale.SIMPLIFIED_CHINESE).getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)").getMessage(1));
     }
 
     @Test
