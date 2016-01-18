@@ -88,7 +88,18 @@ public class TranslationProviderTest implements Locales {
 
     @Test
     public void testGerman() throws Exception {
-        assertEquals("Zurück", new MessageProvider(Locale.GERMANY).getMessage(String.class, "navigation.back", "Back"));
+        MessageProvider germanMessageProvider = new MessageProvider(Locale.GERMANY);
+
+        assertEquals("Zurück", germanMessageProvider.getMessage(String.class, "navigation.back", "Back"));
+
+        NumericTranslation numRecipesTranslation = germanMessageProvider.getMessage(NumericTranslation.class, "recipe-click.num-recipes", "${num-recipes} recipes (Left-click)");
+        assertEquals("1 Rezept (Linksklick)", numRecipesTranslation.getMessage(1));
+        assertEquals("7 Rezepte (Linksklick)", numRecipesTranslation.getMessage(7));
+
+        NumericTranslation numUsagesTranslation = germanMessageProvider.getMessage(NumericTranslation.class, "usage-click.num-usages", "${num-usages} usages (Right-click)");
+        assertEquals("Einmalige Benutzung (Rechtsklick)", numUsagesTranslation.getMessage(1));
+        assertEquals("Zweimalige Benutzung (Rechtsklick)", numUsagesTranslation.getMessage(2));
+        assertEquals("7-malige Benutzung (Rechtsklick)", numUsagesTranslation.getMessage(7));
     }
 
     private List<Locale> getLocales() {
