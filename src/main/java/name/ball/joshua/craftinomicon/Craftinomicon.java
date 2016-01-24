@@ -94,12 +94,11 @@ public class Craftinomicon extends JavaPlugin {
         final ItemStack recipeBookItem = new ItemStack(Material.BOOK);
         itemMetaManipulator.forItemStack(recipeBookItem).setDisplayName(titleTranslation);
 
-        ShapelessRecipe recipeBookRecipe = new ShapelessRecipe(recipeBookItem);
+        final ShapelessRecipe recipeBookRecipe = new ShapelessRecipe(recipeBookItem);
         recipeBookRecipe.addIngredient(Material.BOOK);
         recipeBookRecipe.addIngredient(Material.WORKBENCH);
 
         final Server server = Bukkit.getServer();
-        server.addRecipe(recipeBookRecipe);
 
         class RecipeBookCraftingInterceptor implements Listener {
             @EventHandler
@@ -153,6 +152,7 @@ public class Craftinomicon extends JavaPlugin {
         // to register their recipes.
         new BukkitRunnable() {
             @Override public void run() {
+                server.addRecipe(recipeBookRecipe); // unlimitedrecipes plugin loads after craftinomicon, and calls Bukkit.resetRecipes(), so we need to add the recipe after unlimitedrecipes has loaded
                 materialDataSubstitutes.initialize();
                 recipeSnapshot.initialize();
                 for (Object o : di.getAllKnownInstances()) {
