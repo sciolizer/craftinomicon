@@ -5,7 +5,7 @@
     <groupId>name.ball.joshua.craftinomicon</groupId>
     <artifactId>craftinomicon</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.5.1</version>
+    <version>0.2.5.2</version>
     <name>craftinomicon</name>
     <url>http://maven.apache.org</url>
     <properties>
@@ -80,14 +80,14 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.7.9-R0.2</version>
+            <version>1.9-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mcstats.bukkit</groupId>
             <artifactId>metrics</artifactId>
-            <version>R7</version>
+            <version>R8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
