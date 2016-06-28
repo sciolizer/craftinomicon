@@ -5,7 +5,7 @@
     <groupId>name.ball.joshua.craftinomicon</groupId>
     <artifactId>craftinomicon</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.7</version>
+    <version>0.2.8-SNAPSHOT</version>
     <name>craftinomicon</name>
     <url>https://github.com/sciolizer/craftinomicon</url>
     <description>Craftinomicon is a bukkit plugin. It adds a new item to the game of minecraft, the craftinomicon, which is a cheat sheet for all crafting recipes in the game of minecraft. It is directly inspired by NEI, but as a bukkit plugin, it works with vanilla clients.</description>
