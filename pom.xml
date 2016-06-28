@@ -29,6 +29,7 @@
     <scm>
         <connection>scm:git:https://github.com/sciolizer/craftinomicon.git</connection>
         <developerConnection>scm:git:git://git@github.com:sciolizer/craftinomicon.git</developerConnection>
+        <url>https://github.com/sciolizer/craftinomicon</url>
     </scm>
 
     <build>
